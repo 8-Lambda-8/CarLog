@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,109 +10,134 @@
         android:id="@+id/dateTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="15.09.17  22:58"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        android:text="15.09.17  22:58"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="8dp" />
 
     <TextView
         android:id="@+id/dur"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:text="Dauer:      22:32"
         app:layout_constraintTop_toBottomOf="@+id/dateTime"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="@+id/dateTime" />
+        app:layout_constraintLeft_toRightOf="@+id/refuel"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp" />
 
     <TextView
         android:id="@+id/start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Reutte"
-        android:layout_marginLeft="0dp"
         app:layout_constraintLeft_toLeftOf="@+id/guideline2"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp" />
+        app:layout_constraintTop_toTopOf="@+id/dur" />
 
     <TextView
         android:id="@+id/end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Elbigenalp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/start"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="@+id/start" />
+        android:text="Elbigenalp"
+        app:layout_constraintLeft_toLeftOf="@+id/start"
+        app:layout_constraintTop_toBottomOf="@+id/start" />
 
     <TextView
         android:id="@+id/Tdrain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ø Verbrauch:"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="@+id/guideline3" />
+        app:layout_constraintLeft_toLeftOf="@+id/guideline3"
+        app:layout_constraintTop_toTopOf="@+id/dur" />
 
     <TextView
         android:id="@+id/Tspeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="8dp"
         android:text="Ø Geschw."
         app:layout_constraintLeft_toLeftOf="@+id/Tdrain"
-        app:layout_constraintTop_toBottomOf="@+id/Tdrain" />
+        app:layout_constraintTop_toBottomOf="@+id/Tdrain"
+        android:layout_marginLeft="0dp" />
 
     <TextView
         android:id="@+id/drain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginRight="4dp"
         android:text="4.6 L/100km"
         android:textAlignment="viewEnd"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/Tdrain"
+        android:layout_marginEnd="4dp" />
 
     <TextView
         android:id="@+id/speed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginRight="5dp"
         android:text="80 km/h"
         android:textAlignment="viewEnd"
-        app:layout_constraintTop_toBottomOf="@+id/drain"
-        android:layout_marginRight="0dp"
-        app:layout_constraintRight_toRightOf="@+id/drain" />
+        app:layout_constraintRight_toRightOf="@+id/drain"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/drain" />
 
     <android.support.constraint.Guideline
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/guideline2"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.27" />
-
-    <android.support.constraint.Guideline
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/guideline3"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.57" />
+        app:layout_constraintGuide_percent="0.27"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="104dp" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.67"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="258dp" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="20 km"
-        app:layout_constraintTop_toTopOf="@+id/start"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/end"
         android:layout_marginBottom="8dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="8dp"
+        android:text="20 km"
+        app:layout_constraintBottom_toBottomOf="@+id/end"
         app:layout_constraintRight_toLeftOf="@+id/guideline3"
-        android:layout_marginRight="16dp"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toTopOf="@+id/start"
+        android:layout_marginEnd="32dp" />
+
+    <TextView
+        android:id="@+id/driver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Fahrer: Jakob"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/refuel"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@+id/end"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dur"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@android:color/transparent"
+        android:layout_marginLeft="4dp" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,14 +1,17 @@
 package com.a8lambda8.carlog;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -49,6 +52,10 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             TextView speed = v.findViewById(R.id.speed);
             TextView distance = v.findViewById(R.id.distance);
 
+            TextView driver = v.findViewById(R.id.driver);
+            ImageView IVrefuel = v.findViewById(R.id.refuel);
+            ConstraintLayout CL = v.findViewById(R.id.layout);
+
 
             if(dateTime!=null&&item.gettStart()!=null){
                 dateTime.setText(item.gettStart().format("%d.%m.%y  %H:%M"));
@@ -60,6 +67,10 @@ public class list_adapter extends ArrayAdapter<list_Item> {
                 duration.set(item.gettEnd().toMillis(false) - item.gettStart().toMillis(false)-3600000);
                 
                 dur.setText(duration.format("Dauer:      %H:%M"));
+
+                if(item.getRefuel()) {
+                    dur.setText("Kosten: "+item.getPrice()+" €");
+                }
             }
             if(start!=null){
                 start.setText(item.getStartLoc());
@@ -76,6 +87,24 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             if(distance!=null){
                 distance.setText((item.getEnd()-item.getStart())+" km");
             }
+
+            if(driver!=null) {
+                driver.setText("Fahrer: " + item.getDriverName());
+            }
+
+            if(IVrefuel!=null){
+                if(item.getRefuel()) {
+                    IVrefuel.setImageResource(R.mipmap.refuel);
+                    CL.setBackgroundColor(Color.parseColor("#009000"));
+                }else{
+
+
+                    IVrefuel.setImageDrawable(null);
+                    CL.setBackgroundColor(Color.WHITE);
+                }
+            }
+
+
 
         }
 

@@ -1,5 +1,6 @@
 package com.a8lambda8.carlog;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,6 +8,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -16,9 +18,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     final String dateFormat = "%y-%m-%d_%H-%M-%S";
 
+    String username = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +78,14 @@ public class MainActivity extends AppCompatActivity {
         SP = PreferenceManager.getDefaultSharedPreferences(this);
         SPedit = SP.edit();
         SPedit.apply();
+
+        username = SP.getString("Fahrer","Kein Fahrer");
+
+        if (Objects.equals(username, "")){
+            changeUsername(false);
+            username = SP.getString("Fahrer","Kein Fahrer");
+        }
+
 
         init();
 
@@ -113,6 +127,14 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.action_refuel) {
+            refuel();
+            return true;
+        }
+        if (id == R.id.action_changeUsername) {
+            changeUsername(true);
             return true;
         }
 
@@ -334,6 +356,9 @@ public class MainActivity extends AppCompatActivity {
                 mDatabase.child(timeStart.format(dateFormat)).child("Geschwindigkeit").setValue(""+ET_speed.getText());
                 mDatabase.child(timeStart.format(dateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
 
+                mDatabase.child(timeStart.format(dateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
+
+
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
@@ -384,23 +409,27 @@ public class MainActivity extends AppCompatActivity {
 
                     Map map = (Map) MAP.get(key);
 
-                    tE.set(Integer.valueOf(map.get("EndZeit").toString().substring(15,17)),//sec
-                            Integer.valueOf(map.get("EndZeit").toString().substring(12,14)),//min
-                            Integer.valueOf(map.get("EndZeit").toString().substring(9,11)),//hr
-                            Integer.valueOf(map.get("EndZeit").toString().substring(6,8)),//day
-                            Integer.valueOf(map.get("EndZeit").toString().substring(3,5))-1,//month
-                            2000+Integer.valueOf(map.get("EndZeit").toString().substring(0,2)));//year
-
+                    if(map.get("Endzeit")!=null) {
+                        tE.set(Integer.valueOf(map.get("EndZeit").toString().substring(15, 17)),//sec
+                                Integer.valueOf(map.get("EndZeit").toString().substring(12, 14)),//min
+                                Integer.valueOf(map.get("EndZeit").toString().substring(9, 11)),//hr
+                                Integer.valueOf(map.get("EndZeit").toString().substring(6, 8)),//day
+                                Integer.valueOf(map.get("EndZeit").toString().substring(3, 5)) - 1,//month
+                                2000 + Integer.valueOf(map.get("EndZeit").toString().substring(0, 2)));//year
+                    }
 
                     item.settStart(tS);
                     item.settEnd(tE);
 
-                    Log.i("xxx",""+map);
-                    if(map.get("StartOrt")!=null)
-                        item.setStartLoc(map.get("StartOrt").toString());
+                    //Log.i("xxx",""+map);
 
-                    if(map.get("ZielOrt")!=null)
-                        item.setEndLoc(map.get("ZielOrt").toString());
+                    if(map.get("Tanken")==null) {
+                        if (map.get("StartOrt") != null)
+                            item.setStartLoc(map.get("StartOrt").toString());
+
+                        if (map.get("ZielOrt") != null)
+                            item.setEndLoc(map.get("ZielOrt").toString());
+                    }
 
                     if(map.get("Start")!=null)
                         item.setStart(Integer.valueOf(map.get("Start").toString()));
@@ -408,12 +437,21 @@ public class MainActivity extends AppCompatActivity {
                         item.setEnd(Integer.valueOf(map.get("Ziel").toString()));
 
                     if(map.get("Geschwindigkeit")!=null)
-                    item.setSpeed(map.get("Geschwindigkeit").toString());
+                        item.setSpeed(map.get("Geschwindigkeit").toString());
                     if(map.get("Verbrauch")!=null)
                         item.setDrain(map.get("Verbrauch").toString());
 
-                    ItemList.addItem(item);
 
+                    if(map.get("Fahrer")!=null)
+                        item.setDriverName(map.get("Fahrer").toString());
+
+                    if(map.get("Tanken")!=null)
+                        item.setRefuel(Boolean.valueOf(map.get("Tanken").toString()));
+
+                    if(map.get("Preis")!=null)
+                        item.setPrice(map.get("Preis").toString());
+
+                    ItemList.addItem(item);
 
                 }
 
@@ -504,6 +542,102 @@ public class MainActivity extends AppCompatActivity {
             B_add.setEnabled(true);
         }
 
+    }
+
+    private void changeUsername(Boolean abortable) {
+
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Name ändern");
+
+        final EditText edittext = new EditText(getApplicationContext());
+        alert.setView(edittext);
+
+        edittext.setText(SP.getString("Fahrer",""));
+
+        alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                SPedit.putString("Fahrer",edittext.getText().toString());
+                SPedit.apply();
+
+                if(edittext.getText().toString().length()<3){
+                    changeUsername(false);
+                }
+
+            }
+        });
+
+        alert.setCancelable(false);
+
+        if(abortable) {
+            alert.setCancelable(true);
+            alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // what ever you want to do with No option.
+                }
+            });
+        }
+
+
+        alert.show();
+
+    }
+
+    private void refuel(){
+
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("Tanken");
+
+        View alertView = getLayoutInflater().inflate(R.layout.refuel,null);
+
+        final EditText startKm = alertView.findViewById(R.id.etStart);
+        final EditText endKm = alertView.findViewById(R.id.etEnd);
+
+        final EditText drain = alertView.findViewById(R.id.etDrain);
+        final EditText speed = alertView.findViewById(R.id.etSpeed);
+
+        final EditText price = alertView.findViewById(R.id.etPrice);
+
+        startKm.setText(SP.getString("lastRefuel","0"));
+
+        alert.setView(alertView);
+        alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+
+                Time t = initTime();
+                t.setToNow();
+
+                //mDatabase.child(t.format(dateFormat)).child("EndZeit").setValue(""+timeEnd.format(dateFormat));
+
+                mDatabase.child(t.format(dateFormat)).child("Start").setValue(""+startKm.getText());
+                mDatabase.child(t.format(dateFormat)).child("Ziel").setValue(""+endKm.getText());
+
+                //mDatabase.child(t.format(dateFormat)).child("StartOrt").setValue(""+ET_startLoc.getText());
+                //mDatabase.child(t.format(dateFormat)).child("ZielOrt").setValue(""+ET_endLoc.getText());
+
+                mDatabase.child(t.format(dateFormat)).child("Geschwindigkeit").setValue(""+speed.getText());
+                mDatabase.child(t.format(dateFormat)).child("Verbrauch").setValue(""+drain.getText());
+
+                mDatabase.child(t.format(dateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
+                mDatabase.child(t.format(dateFormat)).child("Preis").setValue(""+price.getText());
+                mDatabase.child(t.format(dateFormat)).child("Tanken").setValue(true);
+
+
+                SPedit.putString("lastRefuel",endKm.getText().toString());
+                SPedit.apply();
+
+            }
+        });
+
+        alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+            }
+        });
+
+        alert.show();
     }
 
 }

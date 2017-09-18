@@ -21,6 +21,11 @@ public class list_Item {
     private String speed = null;
     private String drain = null;
 
+    private String driverName = null;
+
+    private Boolean refuel = false;
+    private String price = null;
+
 
 
     public Time gettStart() {
@@ -94,4 +99,31 @@ public class list_Item {
     }
 
 
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+
+
+
+    public Boolean getRefuel() {
+        return refuel;
+    }
+
+    public void setRefuel(Boolean refuel) {
+        this.refuel = refuel;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
 }
