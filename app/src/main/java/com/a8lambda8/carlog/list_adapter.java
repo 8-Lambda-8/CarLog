@@ -30,7 +30,6 @@ public class list_adapter extends ArrayAdapter<list_Item> {
         super(context, resource, items);
 
         this.context = context;
-        Collections.reverse(items);
         this.items = items;
 
 

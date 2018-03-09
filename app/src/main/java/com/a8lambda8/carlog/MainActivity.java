@@ -33,8 +33,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -561,7 +563,6 @@ public class MainActivity extends AppCompatActivity {
                     ItemList.addItem(item);
 
                 }
-                //Collections.reverse((List<?>) ItemList);
 
                 listAdapter.notifyDataSetInvalidated();
             }
@@ -757,6 +758,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         alert.show();
+    }
+
+    private List<list_Item> reverseListOrder(List<list_Item> status) {
+        Iterator<list_Item> it = status.iterator();
+        List<list_Item> destination = new ArrayList<>();
+        while (it.hasNext()) {
+            destination.add(0, it.next());
+            it.remove();
+        }
+        return destination;
     }
 
     private android.os.Handler Handler = new Handler() {
