@@ -45,7 +45,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_dur" />
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/et_startLoc"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
         app:layout_constraintRight_toLeftOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/et_endLoc"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -125,15 +125,15 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="0dp"
-        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Ø Verbrauch"
         android:inputType="numberDecimal"
         android:textSize="16sp"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/b_lastKm" />
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/et_startKm" />
 
     <EditText
         android:id="@+id/et_speed"
@@ -150,20 +150,6 @@
         app:layout_constraintLeft_toLeftOf="@+id/guideline"
         app:layout_constraintRight_toLeftOf="@+id/textView4"
         app:layout_constraintTop_toTopOf="@+id/et_drain" />
-
-    <Button
-        android:id="@+id/b_lastKm"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="-1dp"
-        android:text="ende letzte Fahrt"
-        android:textSize="10sp"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/et_startKm" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"

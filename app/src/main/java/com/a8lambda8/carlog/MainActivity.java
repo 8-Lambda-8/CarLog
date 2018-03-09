@@ -1,5 +1,6 @@
 package com.a8lambda8.carlog;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -31,7 +33,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
@@ -40,7 +44,8 @@ import java.util.TreeSet;
 public class MainActivity extends AppCompatActivity {
 
     Button B_start, B_stop, B_last, B_add, B_cls;
-    EditText ET_startLoc, ET_endLoc, ET_startKm, ET_endKm, ET_drain, ET_speed;
+    EditText ET_startLoc, ET_startKm, ET_endKm, ET_drain, ET_speed;
+    AutoCompleteTextView ET_endLoc;
     TextView TV_start, TV_end, TV_dur;
     ListView LV;
     list_Item_list ItemList;
@@ -58,6 +63,20 @@ public class MainActivity extends AppCompatActivity {
     final String dateFormat = "%y-%m-%d_%H-%M-%S";
 
     String username = "";
+
+    public static final String[] AutoComplete = new String[]{
+            "Bach", "Berwang", "Schattwald", "Stanzach",
+            "Biberwier", "Bichlbach", "Breitenwang",
+            "Ehenbichl", "Ehrwald", "Elbigenalp", "Elmen",
+            "Forchach", "Grän", "Gramais", "Häselgehr",
+            "Heiterwang", "Hinterhornbach", "Höfen", "Holzgau",
+            "Jungholz", "Kaisers", "Lechaschau", "Lermoos",
+            "Musau", "Namlos", "Nesselwängle", "Pfafflar",
+            "Pflach", "Pinswang", "Reutte", "Steeg",
+            "Tannheim", "Vils", "Vorderhornbach", "Wängle",
+            "Weißenbach am Lech", "Zöblen", "Innsbruck", "Imst",
+            "Grünau",
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,11 +176,16 @@ public class MainActivity extends AppCompatActivity {
 
         ////EditText
         ET_startLoc = (EditText) findViewById(R.id.et_startLoc);
-        ET_endLoc = (EditText) findViewById(R.id.et_endLoc);
+        ET_endLoc = (AutoCompleteTextView) findViewById(R.id.et_endLoc);
         ET_startKm = (EditText) findViewById(R.id.et_startKm);
         ET_endKm = (EditText) findViewById(R.id.et_endKm);
         ET_drain = (EditText) findViewById(R.id.et_drain);
         ET_speed = (EditText) findViewById(R.id.et_speed);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, AutoComplete);
+        ET_endLoc.setAdapter(adapter);
+
 
         ET_startLoc.setText(SP.getString("StartLoc",""));
         ET_endLoc.setText(SP.getString("EndLoc",""));
@@ -297,15 +321,68 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
+
+
+
+
+        /*ET_startKm.setEnabled(false);
+        ET_endKm.setEnabled(false);*/
+
+        ET_startKm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new KMpicker(MainActivity.this,Integer.parseInt(ET_startKm.getText().toString()), Handler, "Start KM eingeben:",2);
+            }
+        });
+        ET_endKm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int in = 0;
+                Log.i("xxx","asd "+ET_endKm.getText());
+                if(ET_endKm.getText()!=null&& !Objects.equals(ET_endKm.getText().toString(), "")){
+                    in = Integer.parseInt(ET_endKm.getText().toString());
+                }
+                Log.i("xxx","in:"+in);
+                if (in<=0){
+                    in = Integer.parseInt(ET_startKm.getText().toString());
+                }
+                new KMpicker(MainActivity.this,in, Handler, "End KM eingeben:",3);
+
+            }
+        });
+
         ////TextViews
         TV_start = (TextView) findViewById(R.id.tv_start);
         TV_end = (TextView) findViewById(R.id.tv_end);
         TV_dur = (TextView) findViewById(R.id.tv_dur);
 
+
+        TV_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(timeStart.toMillis(true)>5000){
+                    new TIME_picker(MainActivity.this,timeStart, Handler,"Start Zeit eingeben:",0);
+                }
+            }
+        });
+
+        TV_end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(!started&&timeEnd.toMillis(true)>5000){
+                    new TIME_picker(MainActivity.this,timeEnd, Handler,"End Zeit eingeben:",1);
+                }
+
+            }
+        });
+
+
         ////Buttons
         B_start = (Button) findViewById(R.id.b_start);
         B_stop = (Button) findViewById(R.id.b_end);
-        B_last = (Button) findViewById(R.id.b_lastKm);
         B_add = (Button) findViewById(R.id.b_add);
         B_cls = (Button) findViewById(R.id.b_cls);
 
@@ -317,6 +394,12 @@ public class MainActivity extends AppCompatActivity {
                 SPedit.putLong("timeStart",timeStart.toMillis(true));
                 SPedit.apply();
                 TV_start.setText(timeStart.format("Start Zeit: %d.%m.  %H:%M:%S"));
+
+                ET_startKm.setText(SP.getString("lastKm",""));
+                ET_startLoc.setText(SP.getString("lastLoc",""));
+
+                B_start.setEnabled(false);
+
                 startDurUpdater();
             }
         });
@@ -332,17 +415,13 @@ public class MainActivity extends AppCompatActivity {
                 addable();
             }
         });
-        B_last.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ET_startKm.setText(SP.getString("lastKm",""));
-            }
-        });
+
         B_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 SPedit.putString("lastKm",ET_endKm.getText().toString());
+                SPedit.putString("lastLoc",ET_endLoc.getText().toString());
                 SPedit.apply();
 
                 mDatabase.child(timeStart.format(dateFormat)).child("EndZeit").setValue(""+timeEnd.format(dateFormat));
@@ -373,7 +452,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                clear();
+
+
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(
+                        MainActivity.this);
+                alert.setTitle("Alert!!");
+                alert.setMessage("Are you sure to delete ");
+                alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //do your work here
+                        dialog.dismiss();
+
+                        clear();
+                        started = false;
+
+                    }
+                });
+                alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                    }
+                });
+
+                alert.show();
 
             }
         });
@@ -409,7 +516,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Map map = (Map) MAP.get(key);
 
-                    if(map.get("Endzeit")!=null) {
+                    if(map.get("EndZeit")!=null) {
                         tE.set(Integer.valueOf(map.get("EndZeit").toString().substring(15, 17)),//sec
                                 Integer.valueOf(map.get("EndZeit").toString().substring(12, 14)),//min
                                 Integer.valueOf(map.get("EndZeit").toString().substring(9, 11)),//hr
@@ -454,6 +561,7 @@ public class MainActivity extends AppCompatActivity {
                     ItemList.addItem(item);
 
                 }
+                //Collections.reverse((List<?>) ItemList);
 
                 listAdapter.notifyDataSetInvalidated();
             }
@@ -502,6 +610,15 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+
+    private void updateDur(){
+
+        duration.set(timeEnd.toMillis(false) - timeStart.toMillis(false)-3600000);
+
+        TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));
+    }
+
+
     private void clear(){
 
         timeStart.set(2000);
@@ -522,6 +639,8 @@ public class MainActivity extends AppCompatActivity {
         TV_start.setText(timeStart.format("Start Zeit: 00.00.  00:00:00"));
         TV_end.setText(timeEnd.format("End  Zeit: 00.00.  00:00:00"));
         TV_dur.setText(duration.format("Dauer:      00:00:00"));
+
+        B_start.setEnabled(true);
 
         addable();
 
@@ -639,5 +758,43 @@ public class MainActivity extends AppCompatActivity {
 
         alert.show();
     }
+
+    private android.os.Handler Handler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+
+            if(msg!=null){
+                switch (msg.arg1){
+                    case 0:{
+                        timeStart.set((Time) msg.obj);
+                        TV_start.setText(((Time) msg.obj).format("Start Zeit: %d.%m.  %H:%M:%S"));
+                        updateDur();
+                        break;
+                    }
+                    case 1:{
+                        timeEnd.set((Time) msg.obj);
+                        TV_end.setText(((Time) msg.obj).format("End Zeit: %d.%m.  %H:%M:%S"));
+                        updateDur();
+                        break;
+                    }
+                    case 2:{
+                        ET_startKm.setText(String.valueOf(msg.arg2));
+                        //fahrt.setZielKM(msg.arg2);
+                        //ref.child("ZielKM").setValue(msg.arg2);
+                        break;
+                    }
+                    case 3:{
+                        ET_endKm.setText(String.valueOf(msg.arg2));
+                        //fahrt.setRückAbholKM(msg.arg2);
+                        //ref.child("RückAbholKM").setValue(msg.arg2);
+                        break;
+                    }
+                }
+            }
+
+
+        }
+    };
 
 }

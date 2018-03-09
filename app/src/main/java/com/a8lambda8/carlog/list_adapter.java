@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,9 @@ public class list_adapter extends ArrayAdapter<list_Item> {
         super(context, resource, items);
 
         this.context = context;
+        Collections.reverse(items);
         this.items = items;
+
 
     }
 
@@ -65,7 +68,7 @@ public class list_adapter extends ArrayAdapter<list_Item> {
                 Time duration =  new Time(Time.getCurrentTimezone());
 
                 duration.set(item.gettEnd().toMillis(false) - item.gettStart().toMillis(false)-3600000);
-                
+
                 dur.setText(duration.format("Dauer:      %H:%M"));
 
                 if(item.getRefuel()) {
