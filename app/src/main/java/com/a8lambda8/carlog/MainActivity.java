@@ -107,6 +107,22 @@ public class MainActivity extends AppCompatActivity {
             username = SP.getString("Fahrer","Kein Fahrer");
         }
 
+        mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i("xx",dataSnapshot.getKey()+" "+dataSnapshot.child("lastLoc").getValue());
+                SPedit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
+                SPedit.putString("lastKm", String.valueOf(dataSnapshot.child("lastKm").getValue()));
+                SPedit.putString("lastLoc", String.valueOf(dataSnapshot.child("lastLoc").getValue()));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
         init();
 
@@ -323,15 +339,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-
-
-        /*ET_startKm.setEnabled(false);
-        ET_endKm.setEnabled(false);*/
-
         ET_startKm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -423,7 +430,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 SPedit.putString("lastKm",ET_endKm.getText().toString());
+                mDatabase.child("!SP_Sync").child("lastKm").setValue(ET_endKm.getText().toString());
                 SPedit.putString("lastLoc",ET_endLoc.getText().toString());
+                mDatabase.child("!SP_Sync").child("lastLoc").setValue(ET_endLoc.getText().toString());
                 SPedit.apply();
 
                 mDatabase.child(timeStart.format(dateFormat)).child("EndZeit").setValue(""+timeEnd.format(dateFormat));
@@ -438,7 +447,6 @@ public class MainActivity extends AppCompatActivity {
                 mDatabase.child(timeStart.format(dateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
 
                 mDatabase.child(timeStart.format(dateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
-
 
                 try {
                     Thread.sleep(50);
@@ -503,68 +511,70 @@ public class MainActivity extends AppCompatActivity {
 
                 SortedSet<String> keys = new TreeSet<String>(MAP.keySet());
                 for (String key : keys) {
+                    if (!Objects.equals(key, "!SP_Sync")) {
 
-                    list_Item item = new list_Item();
+                        list_Item item = new list_Item();
 
-                    Time tS =  new Time(Time.getCurrentTimezone());
-                    Time tE =  new Time(Time.getCurrentTimezone());
+                        Time tS = new Time(Time.getCurrentTimezone());
+                        Time tE = new Time(Time.getCurrentTimezone());
 
-                    tS.set(Integer.valueOf(key.substring(15,17)),//sec
-                            Integer.valueOf(key.substring(12,14)),//min
-                            Integer.valueOf(key.substring(9,11)),//hr
-                            Integer.valueOf(key.substring(6,8)),//day
-                            Integer.valueOf(key.substring(3,5))-1,//month
-                            2000+Integer.valueOf(key.substring(0,2)));//year
+                        tS.set(Integer.valueOf(key.substring(15, 17)),//sec
+                                Integer.valueOf(key.substring(12, 14)),//min
+                                Integer.valueOf(key.substring(9, 11)),//hr
+                                Integer.valueOf(key.substring(6, 8)),//day
+                                Integer.valueOf(key.substring(3, 5)) - 1,//month
+                                2000 + Integer.valueOf(key.substring(0, 2)));//year
 
-                    Map map = (Map) MAP.get(key);
+                        Map map = (Map) MAP.get(key);
 
-                    if(map.get("EndZeit")!=null) {
-                        tE.set(Integer.valueOf(map.get("EndZeit").toString().substring(15, 17)),//sec
-                                Integer.valueOf(map.get("EndZeit").toString().substring(12, 14)),//min
-                                Integer.valueOf(map.get("EndZeit").toString().substring(9, 11)),//hr
-                                Integer.valueOf(map.get("EndZeit").toString().substring(6, 8)),//day
-                                Integer.valueOf(map.get("EndZeit").toString().substring(3, 5)) - 1,//month
-                                2000 + Integer.valueOf(map.get("EndZeit").toString().substring(0, 2)));//year
+                        if (map.get("EndZeit") != null) {
+                            tE.set(Integer.valueOf(map.get("EndZeit").toString().substring(15, 17)),//sec
+                                    Integer.valueOf(map.get("EndZeit").toString().substring(12, 14)),//min
+                                    Integer.valueOf(map.get("EndZeit").toString().substring(9, 11)),//hr
+                                    Integer.valueOf(map.get("EndZeit").toString().substring(6, 8)),//day
+                                    Integer.valueOf(map.get("EndZeit").toString().substring(3, 5)) - 1,//month
+                                    2000 + Integer.valueOf(map.get("EndZeit").toString().substring(0, 2)));//year
+                        }
+
+                        item.settStart(tS);
+                        item.settEnd(tE);
+
+                        //Log.i("xxx",""+map);
+
+                        if (map.get("Tanken") == null) {
+                            if (map.get("StartOrt") != null)
+                                item.setStartLoc(map.get("StartOrt").toString());
+
+                            if (map.get("ZielOrt") != null)
+                                item.setEndLoc(map.get("ZielOrt").toString());
+                        }
+
+                        if (map.get("Start") != null)
+                            item.setStart(Integer.valueOf(map.get("Start").toString()));
+                        if (map.get("Ziel") != null)
+                            item.setEnd(Integer.valueOf(map.get("Ziel").toString()));
+
+                        if (map.get("Geschwindigkeit") != null)
+                            item.setSpeed(map.get("Geschwindigkeit").toString());
+                        if (map.get("Verbrauch") != null)
+                            item.setDrain(map.get("Verbrauch").toString());
+
+
+                        if (map.get("Fahrer") != null)
+                            item.setDriverName(map.get("Fahrer").toString());
+
+                        if (map.get("Tanken") != null)
+                            item.setRefuel(Boolean.valueOf(map.get("Tanken").toString()));
+
+                        if (map.get("Preis") != null)
+                            item.setPrice(map.get("Preis").toString());
+
+                        ItemList.addItem(item);
+
                     }
 
-                    item.settStart(tS);
-                    item.settEnd(tE);
-
-                    //Log.i("xxx",""+map);
-
-                    if(map.get("Tanken")==null) {
-                        if (map.get("StartOrt") != null)
-                            item.setStartLoc(map.get("StartOrt").toString());
-
-                        if (map.get("ZielOrt") != null)
-                            item.setEndLoc(map.get("ZielOrt").toString());
-                    }
-
-                    if(map.get("Start")!=null)
-                        item.setStart(Integer.valueOf(map.get("Start").toString()));
-                    if(map.get("Ziel")!=null)
-                        item.setEnd(Integer.valueOf(map.get("Ziel").toString()));
-
-                    if(map.get("Geschwindigkeit")!=null)
-                        item.setSpeed(map.get("Geschwindigkeit").toString());
-                    if(map.get("Verbrauch")!=null)
-                        item.setDrain(map.get("Verbrauch").toString());
-
-
-                    if(map.get("Fahrer")!=null)
-                        item.setDriverName(map.get("Fahrer").toString());
-
-                    if(map.get("Tanken")!=null)
-                        item.setRefuel(Boolean.valueOf(map.get("Tanken").toString()));
-
-                    if(map.get("Preis")!=null)
-                        item.setPrice(map.get("Preis").toString());
-
-                    ItemList.addItem(item);
-
+                    listAdapter.notifyDataSetInvalidated();
                 }
-
-                listAdapter.notifyDataSetInvalidated();
             }
 
             @Override
@@ -611,14 +621,12 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-
     private void updateDur(){
 
         duration.set(timeEnd.toMillis(false) - timeStart.toMillis(false)-3600000);
 
         TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));
     }
-
 
     private void clear(){
 
