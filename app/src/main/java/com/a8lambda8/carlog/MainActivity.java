@@ -39,8 +39,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -506,10 +508,11 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ItemList.clear();
 
-                final Map<String, Object> MAP = (HashMap<String,Object>) dataSnapshot.getValue();
+                final HashMap<String, Object> MAP = (HashMap<String,Object>) dataSnapshot.getValue();
                 if(MAP==null)return;
 
-                SortedSet<String> keys = new TreeSet<String>(MAP.keySet());
+                SortedSet<String> keys = new TreeSet<String>(Collections.reverseOrder());
+                keys.addAll(new TreeSet<String>(MAP.keySet()));
                 for (String key : keys) {
                     if (!Objects.equals(key, "!SP_Sync")) {
 
@@ -755,6 +758,7 @@ public class MainActivity extends AppCompatActivity {
 
                 SPedit.putString("lastRefuel",endKm.getText().toString());
                 SPedit.apply();
+                mDatabase.child("!SP_Sync").child("lastRefuel").setValue(endKm.getText().toString());
 
             }
         });
