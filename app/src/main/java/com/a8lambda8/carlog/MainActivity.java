@@ -1,7 +1,7 @@
 package com.a8lambda8.carlog;
 
-import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,15 +16,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -33,21 +32,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button B_start, B_stop, B_last, B_add, B_cls;
+    Button B_start, B_stop, B_add, B_cls;
     EditText ET_startLoc, ET_startKm, ET_endKm, ET_drain, ET_speed;
     AutoCompleteTextView ET_endLoc;
     TextView TV_start, TV_end, TV_dur;
@@ -79,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             "Pflach", "Pinswang", "Reutte", "Steeg",
             "Tannheim", "Vils", "Vorderhornbach", "Wängle",
             "Weißenbach am Lech", "Zöblen", "Innsbruck", "Imst",
-            "Grünau",
+            "Grünau", "Stockach",
     };
 
     @Override
@@ -176,6 +170,11 @@ public class MainActivity extends AppCompatActivity {
             changeUsername(true);
             return true;
         }
+        if (id == R.id.action_analysis){
+            Intent analysis_i = new Intent(this, Analysis.class);
+            startActivity(analysis_i);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -202,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         ET_drain = (EditText) findViewById(R.id.et_drain);
         ET_speed = (EditText) findViewById(R.id.et_speed);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, AutoComplete);
         ET_endLoc.setAdapter(adapter);
 
@@ -512,9 +511,9 @@ public class MainActivity extends AppCompatActivity {
                 if(MAP==null)return;
 
                 SortedSet<String> keys = new TreeSet<String>(Collections.reverseOrder());
-                keys.addAll(new TreeSet<String>(MAP.keySet()));
+                keys.addAll(new TreeSet<>(MAP.keySet()));
                 for (String key : keys) {
-                    if (!Objects.equals(key, "!SP_Sync")) {
+                    if (!key.contains("!")){//  Objects.equals(key, "!SP_Sync")) {
 
                         list_Item item = new list_Item();
 
@@ -591,8 +590,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public Time initTime(){
-        Time t = new Time(Time.getCurrentTimezone());
-        return t;
+        return new Time(Time.getCurrentTimezone());
     }
 
     private void startDurUpdater(){
@@ -772,16 +770,6 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private List<list_Item> reverseListOrder(List<list_Item> status) {
-        Iterator<list_Item> it = status.iterator();
-        List<list_Item> destination = new ArrayList<>();
-        while (it.hasNext()) {
-            destination.add(0, it.next());
-            it.remove();
-        }
-        return destination;
-    }
-
     private android.os.Handler Handler = new Handler() {
 
         @Override
@@ -815,7 +803,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
 
         }
     };

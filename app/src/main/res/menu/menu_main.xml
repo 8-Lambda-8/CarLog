@@ -17,4 +17,9 @@
         android:orderInCategory="100"
         android:title="@string/changeUsername"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_analysis"
+        android:orderInCategory="100"
+        android:title="@string/analysis"
+        app:showAsAction="never" />
 </menu>

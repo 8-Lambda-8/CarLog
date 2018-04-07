@@ -3,4 +3,6 @@
     <string name="action_settings">Settings</string>
     <string name="action_refuel">Tanken</string>
     <string name="changeUsername">Name ändern</string>
+    <string name="analysis">Auswertung</string>
+    <string name="title_activity_analysis">Auswertung</string>
 </resources>
