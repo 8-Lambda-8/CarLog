@@ -510,7 +510,7 @@ public class MainActivity extends AppCompatActivity {
                 final HashMap<String, Object> MAP = (HashMap<String,Object>) dataSnapshot.getValue();
                 if(MAP==null)return;
 
-                SortedSet<String> keys = new TreeSet<String>(Collections.reverseOrder());
+                SortedSet<String> keys = new TreeSet<>(Collections.reverseOrder());
                 keys.addAll(new TreeSet<>(MAP.keySet()));
                 for (String key : keys) {
                     if (!key.contains("!")){//  Objects.equals(key, "!SP_Sync")) {
