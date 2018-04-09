@@ -1,15 +1,20 @@
 package com.a8lambda8.carlog;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,8 +37,17 @@ public class Analysis extends AppCompatActivity {
 
     int anz_Fahrten = 0;
     int KM_Ges, KM_Heute;
+    float dVerbrauch;
+    int dGeschw;
 
     Spinner SP_User;
+
+    TextView TV_anzFahrten, TV_KM_GES, TV_KM_Heute, TV_dGeschw, TV_dVerb;
+
+    SharedPreferences SP;
+
+    final String dateFormat = "%y-%m-%d";
+    Time Heute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +67,33 @@ public class Analysis extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        SP = PreferenceManager.getDefaultSharedPreferences(this);
 
-        DatabaseReference userRef = mDatabase.child("!user");
-
+        Heute = new Time(Time.getCurrentTimezone());
 
         init();
 
 
+    }
+
+    void init(){
+        ////Spinner
+        SP_User = (Spinner) findViewById(R.id.sp_user);
+
+        SP_User.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                analyse();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         //get Users for spinner
-
-        Log.i("xx","asd");
+        DatabaseReference userRef = mDatabase.child("!user");
         user = new ArrayList<>();
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -83,42 +113,37 @@ public class Analysis extends AppCompatActivity {
 
             }
         });
-
-    }
-
-    void init(){
-
-        SP_User = (Spinner) findViewById(R.id.sp_user);
-        SP_User.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                analyse();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        Log.i("xx",SP.getString("Fahrer","Kein Fahrer")+"="+user.lastIndexOf(SP.getString("Fahrer","Kein Fahrer")));
+        SP_User.setSelection(user.lastIndexOf(SP.getString("Fahrer","Kein Fahrer")));
 
 
+        ////TextViews
+        TV_anzFahrten = (TextView) findViewById(R.id.tv_anzFahrten);
+        TV_KM_GES = (TextView) findViewById(R.id.tv_KM_Ges);
+        TV_KM_Heute = (TextView) findViewById(R.id.tv_KM_Heute);
+        TV_dGeschw = (TextView) findViewById(R.id.tv_dGeschw);
+        TV_dVerb = (TextView) findViewById(R.id.tv_dVerb);
 
     }
 
 
     void analyse(){
-        //mDatabase.orderByChild()
         mDatabase.addValueEventListener(analyseListener);
     }
-
 
     ValueEventListener analyseListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             anz_Fahrten = 0;
             KM_Ges = 0;
+            KM_Heute = 0;
             int prevZielKm = 0,ZielKm = 0;
-            float dVerbrauch = 0, VerbrauchSUM = 0;
+            dVerbrauch = 0;
+            float VerbrauchSUM = 0;
+            int GeschwSUM = 0;
+            dGeschw = 0;
+            Heute.setToNow();
+
             for (DataSnapshot key : dataSnapshot.getChildren()) {
                 if (!key.getKey().contains("!")&&
                         (key.child("Fahrer").getValue().equals(user.get((int) SP_User.getSelectedItemId()))||SP_User.getSelectedItemId()==4) &&
@@ -135,11 +160,22 @@ public class Analysis extends AppCompatActivity {
                     }
 
                     KM_Ges += dist;
+
+                    //Log.i("xx",key.getKey().substring(0,8));
+
+                    if(key.getKey().substring(0,8).equals(Heute.format(dateFormat))){
+                       KM_Heute += dist;
+                    }
+
                     float verbrauch = Float.parseFloat(key.child("Verbrauch").getValue().toString());
                     VerbrauchSUM += verbrauch*dist;
-                    //Log.i("xx",""+VerbrauchSUM+"---"+key.getKey());
 
+                    int Geschw = 0;
+                    if(key.child("Geschwindigkeit").getValue()!=null)
+                        Geschw = Integer.parseInt(key.child("Geschwindigkeit").getValue().toString());
+                    else Log.i("xx",key.getKey());
 
+                    GeschwSUM += Geschw;
                     if(verbrauch>20)Log.i("xx","ACHTUNG Verbrauch > 20 --- "+verbrauch+"--"+key.getKey());
 
                     if(dist<0){
@@ -156,12 +192,19 @@ public class Analysis extends AppCompatActivity {
             }
             dVerbrauch = VerbrauchSUM/(float)KM_Ges;
 
+            if(KM_Ges!=0)
+                dGeschw = (int)(GeschwSUM/KM_Ges);
+            else dGeschw = 0;
 
             Log.i("xx","-");
             Log.i("xx",SP_User.getSelectedItem()+":");
             Log.i("xx","anz "+anz_Fahrten);
             Log.i("xx","KM  "+KM_Ges);
+            Log.i("xx","KM Heutte "+KM_Heute);
             Log.i("xx","ØVerbr.  "+dVerbrauch);
+            Log.i("xx","ØGeschw.  "+dGeschw);
+
+            updateTV();
         }
 
         @Override
@@ -169,5 +212,16 @@ public class Analysis extends AppCompatActivity {
 
         }
     };
+
+
+    void updateTV(){
+
+        TV_anzFahrten.setText(""+anz_Fahrten);
+        TV_KM_GES.setText(""+KM_Ges);
+        TV_KM_Heute.setText(""+KM_Heute);
+        TV_dGeschw.setText(""+dGeschw);
+        TV_dVerb.setText(""+dVerbrauch);
+
+    }
 
 }

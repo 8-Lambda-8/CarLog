@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i("xx",dataSnapshot.getKey()+" "+dataSnapshot.child("lastLoc").getValue());
                 SPedit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
                 SPedit.putString("lastKm", String.valueOf(dataSnapshot.child("lastKm").getValue()));
                 SPedit.putString("lastLoc", String.valueOf(dataSnapshot.child("lastLoc").getValue()));
