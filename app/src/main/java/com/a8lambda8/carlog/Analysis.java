@@ -118,11 +118,11 @@ public class Analysis extends AppCompatActivity {
 
 
         ////TextViews
-        TV_anzFahrten = (TextView) findViewById(R.id.tv_anzFahrten);
-        TV_KM_GES = (TextView) findViewById(R.id.tv_KM_Ges);
-        TV_KM_Heute = (TextView) findViewById(R.id.tv_KM_Heute);
-        TV_dGeschw = (TextView) findViewById(R.id.tv_dGeschw);
-        TV_dVerb = (TextView) findViewById(R.id.tv_dVerb);
+        TV_anzFahrten = findViewById(R.id.tv_anzFahrten);
+        TV_KM_GES = findViewById(R.id.tv_KM_Ges);
+        TV_KM_Heute = findViewById(R.id.tv_KM_Heute);
+        TV_dGeschw = findViewById(R.id.tv_dGeschw);
+        TV_dVerb = findViewById(R.id.tv_dVerb);
 
     }
 
@@ -175,7 +175,7 @@ public class Analysis extends AppCompatActivity {
                         Geschw = Integer.parseInt(key.child("Geschwindigkeit").getValue().toString());
                     else Log.i("xx",key.getKey());
 
-                    GeschwSUM += Geschw;
+                    GeschwSUM += Geschw*dist;
                     if(verbrauch>20)Log.i("xx","ACHTUNG Verbrauch > 20 --- "+verbrauch+"--"+key.getKey());
 
                     if(dist<0){
@@ -191,9 +191,9 @@ public class Analysis extends AppCompatActivity {
                 }
             }
             dVerbrauch = VerbrauchSUM/(float)KM_Ges;
-
+            Log.d("xx",GeschwSUM+"");
             if(KM_Ges!=0)
-                dGeschw = (int)(GeschwSUM/KM_Ges);
+                dGeschw = GeschwSUM/KM_Ges;
             else dGeschw = 0;
 
             Log.i("xx","-");
