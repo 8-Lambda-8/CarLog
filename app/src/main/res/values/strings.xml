@@ -34,4 +34,5 @@
     <string name="_4_6_l_100km">4.6 L/100km</string>
     <string name="_80_km_h">80 km/h</string>
     <string name="_20_km">20 km</string>
+    <string name="refuelsymbol">refuelSymbol</string>
 </resources>
