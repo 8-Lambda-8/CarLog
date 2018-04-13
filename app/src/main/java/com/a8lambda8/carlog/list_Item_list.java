@@ -1,11 +1,6 @@
 package com.a8lambda8.carlog;
 
-import android.support.annotation.NonNull;
-
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Vector;
 
 /**
@@ -14,30 +9,29 @@ import java.util.Vector;
 
 public class list_Item_list {
 
-    private int itemcount = 0;
+    //private int itemcount = 0;
     private List<list_Item> itemlist;
 
     list_Item_list () {
-        itemlist = new Vector<list_Item>();
+        itemlist = new Vector<>();
     }
 
-    int addItem(list_Item item) {
+    void addItem(list_Item item) {
         itemlist.add(item);
-        itemcount++;
-        return itemcount;
+        //itemcount++;
     }
 
-    list_Item getItem(int location) {
+    /*list_Item getItem(int location) {
         return itemlist.get(location);
-    }
+    }*/
 
     List<list_Item> getAllItems() {
         return itemlist;
     }
 
-    int getItemCount() {
+    /*int getItemCount() {
         return itemcount;
-    }
+    }*/
 
     void clear(){
         itemlist.clear();

@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
 
+import java.util.Objects;
+
 /**
  * Created by jwasl on 23.11.2017.
 
@@ -35,7 +37,7 @@ class TIME_picker {
         final AlertDialog.Builder alert = new AlertDialog.Builder(parent);
 
         alert.setTitle(title);
-        View alertView = inflater.inflate(R.layout.time_picker_layout,null);
+        View alertView = Objects.requireNonNull(inflater).inflate(R.layout.time_picker_layout,null);
         alert.setView(alertView);
 
 

@@ -1,12 +1,11 @@
 package com.a8lambda8.carlog;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.text.format.Time;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,16 +24,17 @@ public class list_adapter extends ArrayAdapter<list_Item> {
     private List<list_Item> items;
     private Context context;
 
-    public list_adapter(@NonNull Context context, int resource, List<list_Item> items ) {
+    list_adapter(@NonNull Context context, int resource, List<list_Item> items) {
         super(context, resource, items);
 
         this.context = context;
         this.items = items;
 
-
     }
 
-    public View getView(int position, View convertView, ViewGroup parent){
+    @SuppressLint("SetTextI18n")
+    @NonNull
+    public View getView(int position, View convertView, @NonNull ViewGroup parent){
         View v = convertView;
         if(v==null){
             LayoutInflater inflater = LayoutInflater.from(context);
