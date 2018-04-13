@@ -1,6 +1,6 @@
 package com.a8lambda8.carlog;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,11 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Objects;
 
 public class Analysis extends AppCompatActivity {
 
@@ -53,10 +49,10 @@ public class Analysis extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_analysis);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -64,7 +60,7 @@ public class Analysis extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         SP = PreferenceManager.getDefaultSharedPreferences(this);
@@ -78,7 +74,7 @@ public class Analysis extends AppCompatActivity {
 
     void init(){
         ////Spinner
-        SP_User = (Spinner) findViewById(R.id.sp_user);
+        SP_User = findViewById(R.id.sp_user);
 
         SP_User.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -137,7 +133,7 @@ public class Analysis extends AppCompatActivity {
             anz_Fahrten = 0;
             KM_Ges = 0;
             KM_Heute = 0;
-            int prevZielKm = 0,ZielKm = 0;
+            int prevZielKm = 0,ZielKm;
             dVerbrauch = 0;
             float VerbrauchSUM = 0;
             int GeschwSUM = 0;
@@ -146,12 +142,12 @@ public class Analysis extends AppCompatActivity {
 
             for (DataSnapshot key : dataSnapshot.getChildren()) {
                 if (!key.getKey().contains("!")&&
-                        (key.child("Fahrer").getValue().equals(user.get((int) SP_User.getSelectedItemId()))||SP_User.getSelectedItemId()==4) &&
+                        (Objects.requireNonNull(key.child("Fahrer").getValue()).equals(user.get((int) SP_User.getSelectedItemId()))||SP_User.getSelectedItemId()==4) &&
                         key.child("Tanken").getValue()==null) {
                     anz_Fahrten++;
 
-                    int startKM = Integer.parseInt(key.child("Start").getValue().toString());
-                    ZielKm=Integer.parseInt(key.child("Ziel").getValue().toString());
+                    int startKM = Integer.parseInt(Objects.requireNonNull(key.child("Start").getValue()).toString());
+                    ZielKm=Integer.parseInt(Objects.requireNonNull(key.child("Ziel").getValue()).toString());
 
                     int dist = ZielKm-startKM;
 
@@ -167,12 +163,12 @@ public class Analysis extends AppCompatActivity {
                        KM_Heute += dist;
                     }
 
-                    float verbrauch = Float.parseFloat(key.child("Verbrauch").getValue().toString());
+                    float verbrauch = Float.parseFloat(Objects.requireNonNull(key.child("Verbrauch").getValue()).toString());
                     VerbrauchSUM += verbrauch*dist;
 
                     int Geschw = 0;
                     if(key.child("Geschwindigkeit").getValue()!=null)
-                        Geschw = Integer.parseInt(key.child("Geschwindigkeit").getValue().toString());
+                        Geschw = Integer.parseInt(Objects.requireNonNull(key.child("Geschwindigkeit").getValue()).toString());
                     else Log.i("xx",key.getKey());
 
                     GeschwSUM += Geschw*dist;
@@ -214,6 +210,7 @@ public class Analysis extends AppCompatActivity {
     };
 
 
+    @SuppressLint("SetTextI18n")
     void updateTV(){
 
         TV_anzFahrten.setText(""+anz_Fahrten);

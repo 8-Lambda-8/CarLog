@@ -1,5 +1,6 @@
 package com.a8lambda8.carlog;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -179,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fab(){
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -193,12 +194,12 @@ public class MainActivity extends AppCompatActivity {
     private void init(){
 
         ////EditText
-        ET_startLoc = (EditText) findViewById(R.id.et_startLoc);
-        ET_endLoc = (AutoCompleteTextView) findViewById(R.id.et_endLoc);
-        ET_startKm = (EditText) findViewById(R.id.et_startKm);
-        ET_endKm = (EditText) findViewById(R.id.et_endKm);
-        ET_drain = (EditText) findViewById(R.id.et_drain);
-        ET_speed = (EditText) findViewById(R.id.et_speed);
+        ET_startLoc = findViewById(R.id.et_startLoc);
+        ET_endLoc = findViewById(R.id.et_endLoc);
+        ET_startKm = findViewById(R.id.et_startKm);
+        ET_endKm = findViewById(R.id.et_endKm);
+        ET_drain = findViewById(R.id.et_drain);
+        ET_speed = findViewById(R.id.et_speed);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, AutoComplete);
@@ -363,9 +364,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ////TextViews
-        TV_start = (TextView) findViewById(R.id.tv_start);
-        TV_end = (TextView) findViewById(R.id.tv_end);
-        TV_dur = (TextView) findViewById(R.id.tv_dur);
+        TV_start = findViewById(R.id.tv_start);
+        TV_end = findViewById(R.id.tv_end);
+        TV_dur = findViewById(R.id.tv_dur);
 
 
         TV_start.setOnClickListener(new View.OnClickListener() {
@@ -390,10 +391,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         ////Buttons
-        B_start = (Button) findViewById(R.id.b_start);
-        B_stop = (Button) findViewById(R.id.b_end);
-        B_add = (Button) findViewById(R.id.b_add);
-        B_cls = (Button) findViewById(R.id.b_cls);
+        B_start = findViewById(R.id.b_start);
+        B_stop = findViewById(R.id.b_end);
+        B_add = findViewById(R.id.b_add);
+        B_cls = findViewById(R.id.b_cls);
 
         B_start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -496,7 +497,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ////ListView
-        LV = (ListView) findViewById(R.id.fahrten);
+        LV = findViewById(R.id.fahrten);
         ItemList = new list_Item_list();
         listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems());
         LV.setAdapter(listAdapter);
@@ -506,6 +507,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ItemList.clear();
 
+                @SuppressWarnings("unchecked")
                 final HashMap<String, Object> MAP = (HashMap<String,Object>) dataSnapshot.getValue();
                 if(MAP==null)return;
 
@@ -540,7 +542,6 @@ public class MainActivity extends AppCompatActivity {
                         item.settStart(tS);
                         item.settEnd(tE);
 
-                        //Log.i("xxx",""+map);
 
                         if (map.get("Tanken") == null) {
                             if (map.get("StartOrt") != null)
@@ -595,7 +596,7 @@ public class MainActivity extends AppCompatActivity {
     private void startDurUpdater(){
 
         started = true;
-        final Handler updater = new Handler(){
+        @SuppressLint("HandlerLeak") final Handler updater = new Handler(){
             @Override
             public void handleMessage(Message msg) {
 
@@ -604,6 +605,16 @@ public class MainActivity extends AppCompatActivity {
                 TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));
             }
         };
+
+        /*static class updater extends Handler{
+
+            @Override
+            public void handleMessage(Message msg){
+
+
+            }
+
+        }*/
 
         new Thread( new Runnable() {
             @Override
@@ -769,6 +780,8 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
+
+    @SuppressLint("HandlerLeak")
     private android.os.Handler Handler = new Handler() {
 
         @Override
