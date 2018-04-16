@@ -118,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         init();
 
         started = SP.getBoolean("started",false);
@@ -172,6 +170,11 @@ public class MainActivity extends AppCompatActivity {
         }
         if (id == R.id.action_analysis){
             Intent analysis_i = new Intent(this, Analysis.class);
+            startActivity(analysis_i);
+            return true;
+        }
+        if (id == R.id.action_List){
+            Intent analysis_i = new Intent(this, List.class);
             startActivity(analysis_i);
             return true;
         }
@@ -463,9 +466,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-
-
-
                 AlertDialog.Builder alert = new AlertDialog.Builder(
                         MainActivity.this);
                 alert.setTitle("Alert!!");
@@ -611,7 +611,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg){
 
-
             }
 
         }*/
@@ -717,7 +716,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-
         alert.show();
 
     }
@@ -744,7 +742,6 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
-
                 Time t = initTime();
                 t.setToNow();
 
@@ -762,7 +759,6 @@ public class MainActivity extends AppCompatActivity {
                 mDatabase.child(t.format(dateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
                 mDatabase.child(t.format(dateFormat)).child("Preis").setValue(""+price.getText());
                 mDatabase.child(t.format(dateFormat)).child("Tanken").setValue(true);
-
 
                 SPedit.putString("lastRefuel",endKm.getText().toString());
                 SPedit.apply();

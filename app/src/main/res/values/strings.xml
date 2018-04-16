@@ -35,4 +35,7 @@
     <string name="_80_km_h">80 km/h</string>
     <string name="_20_km">20 km</string>
     <string name="refuelsymbol">refuelSymbol</string>
+    <string name="ListWithFilter">Liste mit Filter</string>
+    <string name="title_activity_list">List</string>
+    <string name="fahrer">Fahrer:</string>
 </resources>

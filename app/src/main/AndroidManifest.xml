@@ -28,6 +28,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.a8lambda8.carlog.MainActivity" />
         </activity>
+        <activity
+            android:name=".List"
+            android:label="@string/title_activity_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.a8lambda8.carlog.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
