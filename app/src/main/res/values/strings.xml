@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">CarLog</string>
+    <string name="app_name" translatable="false">CarLog</string>
     <string name="action_settings">Settings</string>
     <string name="action_refuel">Tanken</string>
     <string name="changeUsername">Name ändern</string>
-    <string name="analysis">Auswertung</string>
     <string name="title_activity_analysis">Auswertung</string>
     <string name="anzahl_fahrten">Anzahl Fahrten:</string>
     <string name="km_gesamt">KM Gesamt:</string>
@@ -29,13 +28,34 @@
     <string name="km_h">km/h</string>
     <string name="plus">+</string>
     <string name="minus">-</string>
-    <string name="_15_09_17_22_58">15.09.17 22:58</string>
-    <string name="dauer_22_32">Dauer: 22:32</string>
-    <string name="_4_6_l_100km">4.6 L/100km</string>
-    <string name="_80_km_h">80 km/h</string>
-    <string name="_20_km">20 km</string>
     <string name="refuelsymbol">refuelSymbol</string>
     <string name="ListWithFilter">Liste mit Filter</string>
     <string name="title_activity_list">List</string>
     <string name="fahrer">Fahrer:</string>
+
+    <!--Dummy data:-->
+        <string name="_15_09_17_22_58">15.09.17 22:58</string>
+        <string name="dauer_22_32">Dauer: 22:32</string>
+        <string name="_4_6_l_100km">4.6 L/100km</string>
+        <string name="_80_km_h">80 km/h</string>
+        <string name="_20_km">20 km</string>
+    <string name="zeitbereich">Zeitbereich:</string>
+    <string name="art_des_eintrags">Art des Eintrags:</string>
+    <!---->
+
+
+    <string-array name="refuel_spinner">
+        <item>Nur Fahrten</item>
+        <item>Nur Tanken</item>
+        <item>beides</item>
+    </string-array>
+
+    <string-array name="driver_spinner">
+        <item>Alle</item>
+        <item>Jakob</item>
+        <item>Leo</item>
+        <item>Leni</item>
+        <item>Andere</item>
+    </string-array>
+
 </resources>

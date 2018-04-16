@@ -5,7 +5,7 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.a8lambda8.carlog"
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 27
         versionCode 1
         versionName "1.2"

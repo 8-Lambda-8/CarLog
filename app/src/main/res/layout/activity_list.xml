@@ -30,6 +30,35 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="1.4">
+
+                <include
+                    layout="@layout/filter"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+                <!--app:layout_constraintStart_toEndOf="@+id/textView16"-->
+
+                <!--<TextView
+                    android:id="@+id/textView16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="22dp"
+                    android:layout_marginStart="32dp"
+                    android:enabled="false"
+                    android:text="@string/title_activity_list"
+                    android:textSize="36sp"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />-->
+            </android.support.constraint.ConstraintLayout>
 
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -37,15 +66,15 @@
     </android.support.design.widget.AppBarLayout>
 
 
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
+        android:visibility="gone"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_dialog_email"/>
+        app:srcCompat="@android:drawable/ic_dialog_email" />
 
 
     <include
