@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -152,7 +153,7 @@ public class Analysis extends AppCompatActivity {
                     int dist = ZielKm-startKM;
 
                     if(dist>200&&KM_Ges!=0){
-                        Log.i("xx","ACHTUNG über 200 KM ---"+dist+"--"+key.getKey());
+                        Log.w("xx","ACHTUNG über 200 KM ---"+dist+"--"+key.getKey());
                     }
 
                     KM_Ges += dist;
@@ -169,21 +170,20 @@ public class Analysis extends AppCompatActivity {
                     int Geschw = 0;
                     if(key.child("Geschwindigkeit").getValue()!=null)
                         Geschw = Integer.parseInt(Objects.requireNonNull(key.child("Geschwindigkeit").getValue()).toString());
-                    else Log.i("xx",key.getKey());
+                    //else Log.i("xx",key.getKey());
+                    if(Geschw>100||verbrauch<0)Log.w("xx","ACHTUNG Geschwindigkeit > 20 --- "+verbrauch+"--"+key.getKey());
 
                     GeschwSUM += Geschw*dist;
-                    if(verbrauch>20)Log.i("xx","ACHTUNG Verbrauch > 20 --- "+verbrauch+"--"+key.getKey());
+                    if(verbrauch>20||verbrauch<0)Log.w("xx","ACHTUNG Verbrauch > 20 --- "+verbrauch+"--"+key.getKey());
 
                     if(dist<0){
-                        Log.i("xx","ACHTUNG NEGATIV ---"+dist+"--"+key.getKey());
+                        Log.w("xx","ACHTUNG Negative Distanz ---"+dist+"--"+key.getKey());
                     }
 
                     if(startKM!=prevZielKm&&SP_User.getSelectedItemId()==4){
-                        Log.i("xx","ACHTUNG Start != letstes Ziel "+key.getKey()+"---"+(dist));
+                        Log.w("xx","ACHTUNG Start != letstes Ziel "+key.getKey()+"---"+(dist));
                     }
                     prevZielKm=ZielKm;
-
-
                 }
             }
             dVerbrauch = VerbrauchSUM/(float)KM_Ges;

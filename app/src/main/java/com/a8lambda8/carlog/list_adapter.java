@@ -49,6 +49,8 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             TextView dur = v.findViewById(R.id.dur);
             TextView start = v.findViewById(R.id.start);
             TextView end = v.findViewById(R.id.end);
+            TextView startKM = v.findViewById(R.id.startKM);
+            TextView endKM = v.findViewById(R.id.endKM);
             TextView drain = v.findViewById(R.id.drain);
             TextView speed = v.findViewById(R.id.speed);
             TextView distance = v.findViewById(R.id.distance);
@@ -79,6 +81,12 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             if(end!=null){
                 end.setText(item.getEndLoc());
             }
+            if(startKM!=null){
+                startKM.setText(item.getStart()+context.getString(R.string.km));
+            }
+            if(endKM!=null){
+                endKM.setText(item.getEnd()+context.getString(R.string.km));
+            }
             if(drain!=null){
                 drain.setText(item.getDrain());
             }
@@ -86,11 +94,11 @@ public class list_adapter extends ArrayAdapter<list_Item> {
                 speed.setText(item.getSpeed());
             }
             if(distance!=null){
-                distance.setText((item.getEnd()-item.getStart())+" km");
+                distance.setText((item.getEnd()-item.getStart())+context.getString(R.string.km));
             }
 
             if(driver!=null) {
-                driver.setText("Fahrer: " + item.getDriverName());
+                driver.setText(context.getString(R.string.fahrer)+ item.getDriverName());
             }
 
             if(IVrefuel!=null){

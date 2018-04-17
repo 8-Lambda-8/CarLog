@@ -514,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
                 SortedSet<String> keys = new TreeSet<>(Collections.reverseOrder());
                 keys.addAll(new TreeSet<>(MAP.keySet()));
                 for (String key : keys) {
-                    if (!key.contains("!")){//  Objects.equals(key, "!SP_Sync")) {
+                    if (!key.contains("!")){
 
                         list_Item item = new list_Item();
 
