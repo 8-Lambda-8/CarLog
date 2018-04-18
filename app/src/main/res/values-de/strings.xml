@@ -25,8 +25,8 @@
     <string name="title_activity_list">Liste</string>
     <string name="ListWithFilter">Liste mit Filter</string>
     <string name="refuelsymbol">tank Symbol</string>
-    <string name="hinzuf_gen">Add</string>
-    <string name="l_schen">Delete</string>
+    <string name="hinzuf_gen">Hinzufügen</string>
+    <string name="l_schen">Löschen</string>
     <string name="geschwindigkeit" translatable="false">Ø Geschwindigkeit</string>
     <string name="ende_km">ende km</string>
 </resources>

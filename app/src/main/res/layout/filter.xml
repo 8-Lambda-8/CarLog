@@ -91,4 +91,19 @@
         app:layout_constraintTop_toTopOf="@+id/tv_zb_beg"
         tools:ignore="HardcodedText" />
 
+    <CheckBox
+        android:id="@+id/cb_order"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:button="@drawable/custom_check"
+        android:checked="false"
+        app:layout_constraintBottom_toBottomOf="@+id/textView23"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/sp_refuel"
+        app:layout_constraintTop_toTopOf="@+id/textView21" />
+
 </android.support.constraint.ConstraintLayout>

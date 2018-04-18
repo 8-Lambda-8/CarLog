@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
 
-    final String dateFormat = "%y-%m-%d_%H-%M-%S";
+    final String DBdateFormat = "%y-%m-%d_%H-%M-%S";
 
     String username = "";
 
@@ -392,7 +392,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         ////Buttons
         B_start = findViewById(R.id.b_start);
         B_stop = findViewById(R.id.b_end);
@@ -439,18 +438,18 @@ public class MainActivity extends AppCompatActivity {
                 mDatabase.child("!SP_Sync").child("lastLoc").setValue(ET_endLoc.getText().toString());
                 SPedit.apply();
 
-                mDatabase.child(timeStart.format(dateFormat)).child("EndZeit").setValue(""+timeEnd.format(dateFormat));
+                mDatabase.child(timeStart.format(DBdateFormat)).child("EndZeit").setValue(""+timeEnd.format(DBdateFormat));
 
-                mDatabase.child(timeStart.format(dateFormat)).child("Start").setValue(""+ET_startKm.getText());
-                mDatabase.child(timeStart.format(dateFormat)).child("Ziel").setValue(""+ET_endKm.getText());
+                mDatabase.child(timeStart.format(DBdateFormat)).child("Start").setValue(""+ET_startKm.getText());
+                mDatabase.child(timeStart.format(DBdateFormat)).child("Ziel").setValue(""+ET_endKm.getText());
 
-                mDatabase.child(timeStart.format(dateFormat)).child("StartOrt").setValue(""+ET_startLoc.getText());
-                mDatabase.child(timeStart.format(dateFormat)).child("ZielOrt").setValue(""+ET_endLoc.getText());
+                mDatabase.child(timeStart.format(DBdateFormat)).child("StartOrt").setValue(""+ET_startLoc.getText());
+                mDatabase.child(timeStart.format(DBdateFormat)).child("ZielOrt").setValue(""+ET_endLoc.getText());
 
-                mDatabase.child(timeStart.format(dateFormat)).child("Geschwindigkeit").setValue(""+ET_speed.getText());
-                mDatabase.child(timeStart.format(dateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
+                mDatabase.child(timeStart.format(DBdateFormat)).child("Geschwindigkeit").setValue(""+ET_speed.getText());
+                mDatabase.child(timeStart.format(DBdateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
 
-                mDatabase.child(timeStart.format(dateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
+                mDatabase.child(timeStart.format(DBdateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
 
                 try {
                     Thread.sleep(50);
@@ -499,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
         ////ListView
         LV = findViewById(R.id.fahrten);
         ItemList = new list_Item_list();
-        listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems());
+        listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems(),true);
         LV.setAdapter(listAdapter);
 
         mDatabase.addValueEventListener(new ValueEventListener() {
@@ -507,16 +506,10 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ItemList.clear();
 
-                @SuppressWarnings("unchecked")
-                final HashMap<String, Object> MAP = (HashMap<String,Object>) dataSnapshot.getValue();
-                if(MAP==null)return;
+                for (DataSnapshot key : dataSnapshot.getChildren()) {
+                    if (!key.getKey().contains("!")){
 
-                SortedSet<String> keys = new TreeSet<>(Collections.reverseOrder());
-                keys.addAll(new TreeSet<>(MAP.keySet()));
-                for (String key : keys) {
-                    if (!key.contains("!")){
-
-                        list_Item item = new list_Item();
+                        /*list_Item item = new list_Item();
 
                         Time tS = new Time(Time.getCurrentTimezone());
                         Time tE = new Time(Time.getCurrentTimezone());
@@ -569,7 +562,36 @@ public class MainActivity extends AppCompatActivity {
                             item.setRefuel(Boolean.valueOf(map.get("Tanken").toString()));
 
                         if (map.get("Preis") != null)
-                            item.setPrice(map.get("Preis").toString());
+                            item.setPrice(map.get("Preis").toString());*/
+
+                        list_Item item = new list_Item();
+
+                        Time tS = TimeParser(key.getKey(),DBdateFormat);
+                        item.settStart(tS);
+
+                        if (DbVal(key,"Tanken") == null) {
+                            item.setStartLoc(DbString(key,"StartOrt"));
+                            item.setEndLoc(DbString(key,"ZielOrt"));
+
+                            Time tE = TimeParser(""+DbString(key,"EndZeit"),DBdateFormat);
+                            item.settEnd(tE);
+                        }
+
+                        item.setStart(DbInt(key,"Start"));
+                        item.setEnd(DbInt(key,"Ziel"));
+
+                        item.setSpeed(DbString(key,"Geschwindigkeit"));
+                        item.setDrain(DbString(key,"Verbrauch"));
+
+                        item.setDriverName(DbString(key,"Fahrer"));
+
+                        boolean refuel = false;
+                        if (DbVal(key,"Tanken")!=null)
+                            refuel = (boolean) DbVal(key,"Tanken");
+
+                        item.setRefuel(refuel);
+
+                        item.setPrice(DbString(key,"Preis"));
 
                         ItemList.addItem(item);
 
@@ -747,18 +769,18 @@ public class MainActivity extends AppCompatActivity {
 
                 //mDatabase.child(t.format(dateFormat)).child("EndZeit").setValue(""+timeEnd.format(dateFormat));
 
-                mDatabase.child(t.format(dateFormat)).child("Start").setValue(""+startKm.getText());
-                mDatabase.child(t.format(dateFormat)).child("Ziel").setValue(""+endKm.getText());
+                mDatabase.child(t.format(DBdateFormat)).child("Start").setValue(""+startKm.getText());
+                mDatabase.child(t.format(DBdateFormat)).child("Ziel").setValue(""+endKm.getText());
 
                 //mDatabase.child(t.format(dateFormat)).child("StartOrt").setValue(""+ET_startLoc.getText());
                 //mDatabase.child(t.format(dateFormat)).child("ZielOrt").setValue(""+ET_endLoc.getText());
 
-                mDatabase.child(t.format(dateFormat)).child("Geschwindigkeit").setValue(""+speed.getText());
-                mDatabase.child(t.format(dateFormat)).child("Verbrauch").setValue(""+drain.getText());
+                mDatabase.child(t.format(DBdateFormat)).child("Geschwindigkeit").setValue(""+speed.getText());
+                mDatabase.child(t.format(DBdateFormat)).child("Verbrauch").setValue(""+drain.getText());
 
-                mDatabase.child(t.format(dateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
-                mDatabase.child(t.format(dateFormat)).child("Preis").setValue(""+price.getText());
-                mDatabase.child(t.format(dateFormat)).child("Tanken").setValue(true);
+                mDatabase.child(t.format(DBdateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
+                mDatabase.child(t.format(DBdateFormat)).child("Preis").setValue(""+price.getText());
+                mDatabase.child(t.format(DBdateFormat)).child("Tanken").setValue(true);
 
                 SPedit.putString("lastRefuel",endKm.getText().toString());
                 SPedit.apply();
@@ -775,7 +797,6 @@ public class MainActivity extends AppCompatActivity {
 
         alert.show();
     }
-
 
     @SuppressLint("HandlerLeak")
     private android.os.Handler Handler = new Handler() {
@@ -814,5 +835,32 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    Object DbVal(DataSnapshot key,String child){
+        return key.child(child).getValue();
+    }
+
+    int DbInt(DataSnapshot key,String child){
+        if (DbVal(key,child)!=null)
+            return Integer.valueOf(DbString(key,child));
+        else return 0;
+    }
+
+    String DbString(DataSnapshot key,String child){
+        if (DbVal(key,child)!=null)
+            return DbVal(key,child).toString();
+        else return  "";
+    }
+
+    Time TimeParser(String time, String format){
+        Time t = new Time(Time.getCurrentTimezone());
+        if(format.charAt(1)=='y')
+            t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
+                    Integer.parseInt(time.substring(6,8)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(0,2)));
+        else if(format.charAt(1)=='d')
+            t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
+                    Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(6,8)));
+        return t;
+    }
 
 }

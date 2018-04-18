@@ -158,7 +158,6 @@ public class Analysis extends AppCompatActivity {
 
                     KM_Ges += dist;
 
-                    //Log.i("xx",key.getKey().substring(0,8));
 
                     if(key.getKey().substring(0,8).equals(Heute.format(dateFormat))){
                        KM_Heute += dist;
@@ -187,18 +186,18 @@ public class Analysis extends AppCompatActivity {
                 }
             }
             dVerbrauch = VerbrauchSUM/(float)KM_Ges;
-            Log.d("xx",GeschwSUM+"");
+
             if(KM_Ges!=0)
                 dGeschw = GeschwSUM/KM_Ges;
             else dGeschw = 0;
 
-            Log.i("xx","-");
+            /*Log.i("xx","-");
             Log.i("xx",SP_User.getSelectedItem()+":");
             Log.i("xx","anz "+anz_Fahrten);
             Log.i("xx","KM  "+KM_Ges);
             Log.i("xx","KM Heutte "+KM_Heute);
             Log.i("xx","ØVerbr.  "+dVerbrauch);
-            Log.i("xx","ØGeschw.  "+dGeschw);
+            Log.i("xx","ØGeschw.  "+dGeschw);*/
 
             updateTV();
         }

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +24,19 @@ public class list_adapter extends ArrayAdapter<list_Item> {
 
     private List<list_Item> items;
     private Context context;
+    boolean reverse;
 
-    list_adapter(@NonNull Context context, int resource, List<list_Item> items) {
+    list_adapter(@NonNull Context context, int resource, List<list_Item> items,boolean reverse) {
         super(context, resource, items);
 
         this.context = context;
         this.items = items;
+        this.reverse = reverse;
 
+    }
+
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
     }
 
     @SuppressLint("SetTextI18n")
@@ -41,7 +48,13 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             v = inflater.inflate(R.layout.list_item,null);
         }
 
-        list_Item item = items.get(position);
+        list_Item item;
+
+        if(reverse)
+            item = items.get(getCount() - (position+1));
+        else
+            item = items.get(position);
+
 
         if(item!=null){
 
@@ -63,7 +76,8 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             if(dateTime!=null&&item.gettStart()!=null){
                 dateTime.setText(item.gettStart().format("%d.%m.%y  %H:%M"));
             }
-            if(dur!=null&&item.gettEnd()!=null&&item.gettStart()!=null){
+
+            if(!item.getRefuel()){//dur!=null&&item.gettEnd()!=null&&item.gettStart()!=null){
 
                 Time duration =  new Time(Time.getCurrentTimezone());
 
@@ -71,10 +85,12 @@ public class list_adapter extends ArrayAdapter<list_Item> {
 
                 dur.setText(duration.format("Dauer:      %H:%M"));
 
-                if(item.getRefuel()) {
-                    dur.setText("Kosten: "+item.getPrice()+" €");
-                }
             }
+
+            if(item.getRefuel()) {
+                dur.setText("Kosten: "+item.getPrice()+" €");
+            }
+
             if(start!=null){
                 start.setText(item.getStartLoc());
             }

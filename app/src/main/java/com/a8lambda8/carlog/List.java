@@ -1,6 +1,9 @@
 package com.a8lambda8.carlog;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
@@ -10,6 +13,8 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,7 +25,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class List extends AppCompatActivity {
@@ -28,6 +32,8 @@ public class List extends AppCompatActivity {
     Spinner SP_driver,SP_refuel;
 
     TextView TV_ZB_Beg, TV_ZB_End;
+
+    CheckBox CB_Order;
 
     ListView LV;
     list_Item_list ItemList;
@@ -70,6 +76,8 @@ public class List extends AppCompatActivity {
     }
 
     void init(){
+
+        ////Spinner
         SP_driver = findViewById(R.id.sp_driver);
         SP_refuel = findViewById(R.id.sp_refuel);
         AdapterView.OnItemSelectedListener ISL = new AdapterView.OnItemSelectedListener() {
@@ -86,8 +94,7 @@ public class List extends AppCompatActivity {
         SP_driver.setOnItemSelectedListener(ISL);
         SP_refuel.setOnItemSelectedListener(ISL);
 
-
-
+        ////TextViews
         TV_ZB_Beg = findViewById(R.id.tv_zb_beg);
         TV_ZB_End = findViewById(R.id.tv_zb_end);
 
@@ -97,14 +104,23 @@ public class List extends AppCompatActivity {
         TV_ZB_Beg.setOnClickListener(TV_zb_OnClickListener);
         TV_ZB_End.setOnClickListener(TV_zb_OnClickListener);
 
+        ////Checkbox
+        CB_Order = findViewById(R.id.cb_order);
+        CB_Order.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                listAdapter.setReverse(isChecked);
+                updateLV();
+            }
+        });
+
         ////List View
         LV = findViewById(R.id.LV_filter);
         ItemList = new list_Item_list();
-        listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems());
+        listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems(),false);
         LV.setAdapter(listAdapter);
 
         ViewCompat.setNestedScrollingEnabled(LV, true);
-
 
     }
 
@@ -114,7 +130,7 @@ public class List extends AppCompatActivity {
 
             TextView tv = findViewById(v.getId());
 
-            new DateTimePicker(tv, tv.getContext()).show();
+            new DateTimePicker(tv, tv.getContext(),handler).show();
         }
     };
 
@@ -122,10 +138,10 @@ public class List extends AppCompatActivity {
         Time t = new Time(Time.getCurrentTimezone());
         if(format.charAt(1)=='y')
             t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
-                    Integer.parseInt(time.substring(6,8)),Integer.parseInt(time.substring(3,5))-1,Integer.parseInt(time.substring(0,2)));
+                    Integer.parseInt(time.substring(6,8)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(0,2)));
         else if(format.charAt(1)=='d')
             t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
-                    Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,Integer.parseInt(time.substring(6,8)));
+                    Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(6,8)));
         return t;
     }
 
@@ -144,54 +160,43 @@ public class List extends AppCompatActivity {
             for (DataSnapshot key : dataSnapshot.getChildren()) {
 
                 boolean refuel = false;
-                if (key.child("Tanken").getValue()!=null)
-                    refuel = (boolean) key.child("Tanken").getValue();
+                if (DbVal(key,"Tanken")!=null)
+                    refuel = (boolean) DbVal(key,"Tanken");
 
                 if (!key.getKey().contains("!")&&
                         (Objects.requireNonNull(key.child("Fahrer").getValue()).equals(SP_driver.getSelectedItem().toString())||SP_driver.getSelectedItemId()==0) &&
+                        (zb_beg.toMillis(false)<TimeParser(key.getKey(),DBdateFormat).toMillis(false)&&zb_end.toMillis(false)>TimeParser(key.getKey(),DBdateFormat).toMillis(false))&&
                         showRefuel(refuel)) {
-                    Log.d("xx","nr: "+n+ "     refuel_Result:"+showRefuel(refuel));
+                    //Log.d("xx","nr: "+n+ "     refuel_Result:"+showRefuel(refuel));
                     n++;
 
                     list_Item item = new list_Item();
 
                     Time tS = TimeParser(key.getKey(),DBdateFormat);
-                    Time tE = new Time(Time.getCurrentTimezone());
-
-                    if (key.child("EndZeit").getValue() != null)
-                        tE = TimeParser(""+DbVal(key,"EndZeit").toString(),DBdateFormat);
+                    //Time tE = TimeParser(""+DbString(key,"EndZeit"),DBdateFormat);
 
                     item.settStart(tS);
-                    item.settEnd(tE);
+                    //item.settEnd(tE);
 
+                    if (!refuel) {
+                        item.setStartLoc(DbString(key,"StartOrt"));
+                        item.setEndLoc(DbString(key,"ZielOrt"));
 
-                    if (DbVal(key,"Tanken") == null) {
-                        //if (DbVal(key,"StartOrt") != null)
-                            item.setStartLoc(DbString(key,"StartOrt"));
-
-                        //if (key.child("ZielOrt").getValue() != null)
-                            item.setEndLoc(DbString(key,"ZielOrt"));
+                        Time tE = TimeParser(""+DbString(key,"EndZeit"),DBdateFormat);
+                        item.settEnd(tE);
                     }
 
-                    if (key.child("Start").getValue() != null)
-                        item.setStart(DbInt(key,"Start"));
-                    if (key.child("Ziel").getValue() != null)
-                        item.setEnd(DbInt(key,"Ziel"));
+                    item.setStart(DbInt(key,"Start"));
+                    item.setEnd(DbInt(key,"Ziel"));
 
-                    if (key.child("Geschwindigkeit").getValue() != null)
-                        item.setSpeed(DbString(key,"Geschwindigkeit"));
-                    if (key.child("Verbrauch").getValue() != null)
-                        item.setDrain(DbString(key,"Verbrauch"));
+                    item.setSpeed(DbString(key,"Geschwindigkeit"));
+                    item.setDrain(DbString(key,"Verbrauch"));
 
+                    item.setDriverName(DbString(key,"Fahrer"));
 
-                    if (key.child("Fahrer").getValue() != null)
-                        item.setDriverName(DbString(key,"Fahrer"));
+                    item.setRefuel(refuel);
 
-                    if (key.child("Tanken").getValue() != null)
-                        item.setRefuel(Boolean.valueOf(DbString(key,"Tanken")));
-
-                    if (key.child("Preis").getValue() != null)
-                        item.setPrice(DbString(key,"Preis"));
+                    item.setPrice(DbString(key,"Preis"));
 
                     ItemList.addItem(item);
 
@@ -208,7 +213,7 @@ public class List extends AppCompatActivity {
     };
 
     boolean showRefuel(boolean refuel){
-        Log.d("xx","refuel Bool: "+refuel+"   spinner: "+SP_refuel.getSelectedItemId());
+        //Log.d("xx","refuel Bool: "+refuel+"   spinner: "+SP_refuel.getSelectedItemId());
 
         switch ((int) SP_refuel.getSelectedItemId()){
             case 0:{
@@ -239,5 +244,23 @@ public class List extends AppCompatActivity {
             return DbVal(key,child).toString();
         else return  "";
     }
+
+    @SuppressLint("HandlerLeak")
+    android.os.Handler handler = new Handler(){
+
+        @Override
+        public void handleMessage(Message msg) {
+
+            if(msg!=null) {
+                switch (msg.arg1) {
+                    case 0: {
+                        updateLV();
+                    }
+                }
+            }
+
+        }
+
+    };
 
 }

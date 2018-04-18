@@ -3,6 +3,8 @@ package com.a8lambda8.carlog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.text.format.Time;
 import android.util.Log;
 import android.widget.DatePicker;
@@ -22,11 +24,13 @@ public class DateTimePicker {
     private Time newTime;
     private int THEME = R.style.Theme_AppCompat_Light_Dialog_Alert;
     private Context con;
+    private Handler mResponseHandler;
 
-    DateTimePicker(TextView tv, Context c) {
+    DateTimePicker(TextView tv, Context c, final Handler mResponseHandler) {
         TV_out = tv;
         startTime = TimeParser(tv.getText().toString(),dateFormat);
         con = c;
+        this.mResponseHandler = mResponseHandler;
     }
 
 
@@ -49,6 +53,11 @@ public class DateTimePicker {
                         else if (TV_out.getId()==R.id.tv_zb_end)
                             zb_end.set(newTime.toMillis(false));
                         TV_out.setText(newTime.format(dateFormat));
+
+                        Message msg = new Message();
+                        msg.arg1 = 0;
+                        mResponseHandler.sendMessage(msg);
+
                     }
                 }, startTime.hour, startTime.minute,true);
                 mTimePicker.setTitle(con.getString(R.string.selectTime));
