@@ -40,7 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences.Editor SPedit;
 
     static DatabaseReference mDatabase;
-    private FirebaseAuth mAuth;
     FirebaseUser currentUser;
 
     private static final int RC_SIGN_IN = 123;
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     String username = "";
 
-    static boolean TestDevice;
+    static boolean TestDevice = true;
 
     public static final String[] AutoComplete = new String[]{
             "Bach", "Berwang", "Schattwald", "Stanzach",
@@ -96,13 +95,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         currentUser = mAuth.getCurrentUser();
         Log.d(TAG,"user: "+currentUser);
         if(currentUser==null) {
 
-            List<AuthUI.IdpConfig> providers = Arrays.asList(
+            //List<AuthUI.IdpConfig> providers = Arrays.asList(
+            List<AuthUI.IdpConfig> providers = Collections.singletonList(
                     //new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                     //new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build());
@@ -119,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         Log.d(TAG, "EMAIL: "+ currentUser.getEmail());
-        TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
+        if (currentUser.getEmail()!=null)
+            TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
         Log.d(TAG, "is test Device:"+ TestDevice);
         if(TestDevice)mDatabase = mDatabase.child("!Test");
 
