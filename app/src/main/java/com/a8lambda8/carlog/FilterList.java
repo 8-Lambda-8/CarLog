@@ -10,7 +10,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -21,13 +20,14 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
 
-public class List extends AppCompatActivity {
+import static com.a8lambda8.carlog.MainActivity.mDatabase;
+
+public class FilterList extends AppCompatActivity {
 
     Spinner SP_driver,SP_refuel;
 
@@ -40,8 +40,6 @@ public class List extends AppCompatActivity {
     list_adapter listAdapter;
 
     static Time zb_beg, zb_end;
-
-    DatabaseReference mDatabase;
 
     final String DBdateFormat = "%y-%m-%d_%H-%M-%S";
     final String dateFormat = "%d.%m.%y  %H:%M";
@@ -165,7 +163,7 @@ public class List extends AppCompatActivity {
 
                 if (!key.getKey().contains("!")&&
                         (Objects.requireNonNull(key.child("Fahrer").getValue()).equals(SP_driver.getSelectedItem().toString())||SP_driver.getSelectedItemId()==0) &&
-                        (zb_beg.toMillis(false)<TimeParser(key.getKey(),DBdateFormat).toMillis(false)&&zb_end.toMillis(false)>TimeParser(key.getKey(),DBdateFormat).toMillis(false))&&
+                        (zb_beg.toMillis(false)<=TimeParser(key.getKey(),DBdateFormat).toMillis(false)&&zb_end.toMillis(false)>TimeParser(key.getKey(),DBdateFormat).toMillis(false))&&
                         showRefuel(refuel)) {
                     //Log.d("xx","nr: "+n+ "     refuel_Result:"+showRefuel(refuel));
                     n++;
@@ -173,10 +171,8 @@ public class List extends AppCompatActivity {
                     list_Item item = new list_Item();
 
                     Time tS = TimeParser(key.getKey(),DBdateFormat);
-                    //Time tE = TimeParser(""+DbString(key,"EndZeit"),DBdateFormat);
 
                     item.settStart(tS);
-                    //item.settEnd(tE);
 
                     if (!refuel) {
                         item.setStartLoc(DbString(key,"StartOrt"));

@@ -26,11 +26,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.a8lambda8.carlog.MainActivity.mDatabase;
+
 public class Analysis extends AppCompatActivity {
 
     ArrayList<String> user;
-
-    DatabaseReference mDatabase;
 
     int anz_Fahrten = 0;
     int KM_Ges, KM_Heute;
@@ -97,7 +97,7 @@ public class Analysis extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 user.clear();
                 for (DataSnapshot key : dataSnapshot.getChildren()) {
-                    user.add(Integer.parseInt(key.getKey()),""+key.getValue());
+                    user.add(Integer.parseInt(key.getKey()),""+key.child("Name").getValue());
                 }
 
                 ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(Analysis.this, android.R.layout.simple_spinner_item, user);

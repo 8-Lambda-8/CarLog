@@ -29,7 +29,7 @@
                 android:value="com.a8lambda8.carlog.MainActivity" />
         </activity>
         <activity
-            android:name=".List"
+            android:name=".FilterList"
             android:label="@string/title_activity_list"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">

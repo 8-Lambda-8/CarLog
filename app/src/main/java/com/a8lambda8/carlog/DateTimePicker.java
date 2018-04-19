@@ -11,8 +11,8 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import static com.a8lambda8.carlog.List.zb_beg;
-import static com.a8lambda8.carlog.List.zb_end;
+import static com.a8lambda8.carlog.FilterList.zb_beg;
+import static com.a8lambda8.carlog.FilterList.zb_end;
 
 /**
  * Created by jwasl on 17.04.2018.

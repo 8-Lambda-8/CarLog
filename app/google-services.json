@@ -15,19 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "824177047702-uasvliqlssitr1dfkmscsoi4pat7k8ak.apps.googleusercontent.com",
+          "client_id": "824177047702-1brch44jjnadapuniadtevjldbf88oc7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.a8lambda8.carlog",
-            "certificate_hash": "68db96e71a4af92e280dbd9c39d26ee120a5547a"
-          }
-        },
-        {
-          "client_id": "824177047702-5vuod8k2oo2guvo15tkfmiekgqnrkd0a.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.a8lambda8.carlog",
-            "certificate_hash": "d8ec7fd0601157564be6895b1210847917b89932"
+            "certificate_hash": "d1ea80a01f7717650aced2a97799249dcc92aadd"
           }
         },
         {
