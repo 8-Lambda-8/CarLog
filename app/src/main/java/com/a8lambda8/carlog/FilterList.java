@@ -152,7 +152,7 @@ public class FilterList extends AppCompatActivity {
     ValueEventListener VEL = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            int n = 0;
+            //int n = 0;
             ItemList.clear();
 
             for (DataSnapshot key : dataSnapshot.getChildren()) {
@@ -166,7 +166,7 @@ public class FilterList extends AppCompatActivity {
                         (zb_beg.toMillis(false)<=TimeParser(key.getKey(),DBdateFormat).toMillis(false)&&zb_end.toMillis(false)>TimeParser(key.getKey(),DBdateFormat).toMillis(false))&&
                         showRefuel(refuel)) {
                     //Log.d("xx","nr: "+n+ "     refuel_Result:"+showRefuel(refuel));
-                    n++;
+                    //n++;
 
                     list_Item item = new list_Item();
 
