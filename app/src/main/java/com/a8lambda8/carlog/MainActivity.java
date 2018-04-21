@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         currentUser = mAuth.getCurrentUser();
-        Log.d(TAG,"user: "+currentUser);
         if(currentUser==null) {
 
             //List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -114,15 +113,19 @@ public class MainActivity extends AppCompatActivity {
                             .setAvailableProviders(providers)
                             .build(),
                     RC_SIGN_IN);
+            return;
         }
 
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        Log.d(TAG, "EMAIL: "+ currentUser.getEmail());
-        if (currentUser.getEmail()!=null)
-            TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
-        Log.d(TAG, "is test Device:"+ TestDevice);
-        if(TestDevice)mDatabase = mDatabase.child("!Test");
+        if(currentUser!=null) {
+            Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
+            Log.d(TAG, "EMAIL: " + currentUser.getEmail());
+            if (currentUser.getEmail() != null && !Objects.equals(currentUser.getEmail(), ""))
+                TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
+            username = Objects.requireNonNull(currentUser.getDisplayName()).split(" ")[0];
+        }    //Log.d(TAG, "is test Device:"+ TestDevice);
+        if (TestDevice) mDatabase = mDatabase.child("!Test");
+
 
         fab();
 
@@ -135,12 +138,11 @@ public class MainActivity extends AppCompatActivity {
         SPedit = SP.edit();
         SPedit.apply();
 
-        username = SP.getString("Fahrer","Kein Fahrer");
-
+        /*username = SP.getString("Fahrer","Kein Fahrer");
         if (Objects.equals(username, "")){
             changeUsername(false);
             username = SP.getString("Fahrer","Kein Fahrer");
-        }
+        }*/
 
 
         mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
@@ -868,7 +870,11 @@ public class MainActivity extends AppCompatActivity {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 Log.d(TAG,""+user);
-                // ...
+
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+
             } else {
                 // Sign in failed, check response for error code
                 System.exit(1);

@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class Analysis extends AppCompatActivity {
         });
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        //mDatabase = FirebaseDatabase.getInstance().getReference();
         SP = PreferenceManager.getDefaultSharedPreferences(this);
 
         Heute = new Time(Time.getCurrentTimezone());
@@ -175,7 +174,7 @@ public class Analysis extends AppCompatActivity {
                     if(verbrauch>20||verbrauch<0)Log.w("xx","ACHTUNG Verbrauch > 20 --- "+verbrauch+"--"+key.getKey());
 
                     if(dist<0){
-                        Log.w("xx","ACHTUNG Negative Distanz ---"+dist+"--"+key.getKey());
+                        Log.w("xx","ACHTUNG Negative Distanz --- "+dist+"--"+key.getKey());
                     }
 
                     if(startKM!=prevZielKm&&SP_User.getSelectedItemId()==4){
