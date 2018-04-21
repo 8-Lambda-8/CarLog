@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -27,12 +28,20 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,11 +61,18 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences SP;
     SharedPreferences.Editor SPedit;
 
-    private DatabaseReference mDatabase;
+    static DatabaseReference mDatabase;
+    FirebaseUser currentUser;
+
+    private static final int RC_SIGN_IN = 123;
+
+    private static final String TAG = "xx";
 
     final String DBdateFormat = "%y-%m-%d_%H-%M-%S";
 
     String username = "";
+
+    static boolean TestDevice = true;
 
     public static final String[] AutoComplete = new String[]{
             "Bach", "Berwang", "Schattwald", "Stanzach",
@@ -79,7 +95,37 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser==null) {
+
+            //List<AuthUI.IdpConfig> providers = Arrays.asList(
+            List<AuthUI.IdpConfig> providers = Collections.singletonList(
+                    //new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                    //new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
+                    new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build());
+
+            // Create and launch sign-in intent
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setAvailableProviders(providers)
+                            .build(),
+                    RC_SIGN_IN);
+            return;
+        }
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        if(currentUser!=null) {
+            Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
+            Log.d(TAG, "EMAIL: " + currentUser.getEmail());
+            if (currentUser.getEmail() != null && !Objects.equals(currentUser.getEmail(), ""))
+                TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
+            username = Objects.requireNonNull(currentUser.getDisplayName()).split(" ")[0];
+        }    //Log.d(TAG, "is test Device:"+ TestDevice);
+        if (TestDevice) mDatabase = mDatabase.child("!Test");
+
 
         fab();
 
@@ -92,12 +138,12 @@ public class MainActivity extends AppCompatActivity {
         SPedit = SP.edit();
         SPedit.apply();
 
-        username = SP.getString("Fahrer","Kein Fahrer");
-
+        /*username = SP.getString("Fahrer","Kein Fahrer");
         if (Objects.equals(username, "")){
             changeUsername(false);
             username = SP.getString("Fahrer","Kein Fahrer");
-        }
+        }*/
+
 
         mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
@@ -169,9 +215,18 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_List){
-            Intent analysis_i = new Intent(this, List.class);
+            Intent analysis_i = new Intent(this, FilterList.class);
             startActivity(analysis_i);
             return true;
+        }
+        if(id == R.id.action_logOut){
+            AuthUI.getInstance()
+                    .signOut(this)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        public void onComplete(@NonNull Task<Void> task) {
+                            System.exit(1);
+                        }
+                    });
         }
 
         return super.onOptionsItemSelected(item);
@@ -503,62 +558,7 @@ public class MainActivity extends AppCompatActivity {
 
                 for (DataSnapshot key : dataSnapshot.getChildren()) {
                     if (!key.getKey().contains("!")){
-
-                        /*list_Item item = new list_Item();
-
-                        Time tS = new Time(Time.getCurrentTimezone());
-                        Time tE = new Time(Time.getCurrentTimezone());
-
-                        tS.set(Integer.valueOf(key.substring(15, 17)),//sec
-                                Integer.valueOf(key.substring(12, 14)),//min
-                                Integer.valueOf(key.substring(9, 11)),//hr
-                                Integer.valueOf(key.substring(6, 8)),//day
-                                Integer.valueOf(key.substring(3, 5)) - 1,//month
-                                2000 + Integer.valueOf(key.substring(0, 2)));//year
-
-                        Map map = (Map) MAP.get(key);
-
-                        if (map.get("EndZeit") != null) {
-                            tE.set(Integer.valueOf(map.get("EndZeit").toString().substring(15, 17)),//sec
-                                    Integer.valueOf(map.get("EndZeit").toString().substring(12, 14)),//min
-                                    Integer.valueOf(map.get("EndZeit").toString().substring(9, 11)),//hr
-                                    Integer.valueOf(map.get("EndZeit").toString().substring(6, 8)),//day
-                                    Integer.valueOf(map.get("EndZeit").toString().substring(3, 5)) - 1,//month
-                                    2000 + Integer.valueOf(map.get("EndZeit").toString().substring(0, 2)));//year
-                        }
-
-                        item.settStart(tS);
-                        item.settEnd(tE);
-
-
-                        if (map.get("Tanken") == null) {
-                            if (map.get("StartOrt") != null)
-                                item.setStartLoc(map.get("StartOrt").toString());
-
-                            if (map.get("ZielOrt") != null)
-                                item.setEndLoc(map.get("ZielOrt").toString());
-                        }
-
-                        if (map.get("Start") != null)
-                            item.setStart(Integer.valueOf(map.get("Start").toString()));
-                        if (map.get("Ziel") != null)
-                            item.setEnd(Integer.valueOf(map.get("Ziel").toString()));
-
-                        if (map.get("Geschwindigkeit") != null)
-                            item.setSpeed(map.get("Geschwindigkeit").toString());
-                        if (map.get("Verbrauch") != null)
-                            item.setDrain(map.get("Verbrauch").toString());
-
-
-                        if (map.get("Fahrer") != null)
-                            item.setDriverName(map.get("Fahrer").toString());
-
-                        if (map.get("Tanken") != null)
-                            item.setRefuel(Boolean.valueOf(map.get("Tanken").toString()));
-
-                        if (map.get("Preis") != null)
-                            item.setPrice(map.get("Preis").toString());*/
-
+                        //Log.d(TAG,""+key);
                         list_Item item = new list_Item();
 
                         Time tS = TimeParser(key.getKey(),DBdateFormat);
@@ -857,5 +857,30 @@ public class MainActivity extends AppCompatActivity {
                     Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(6,8)));
         return t;
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            Log.d(TAG,""+response);
+
+            if (resultCode == RESULT_OK) {
+                // Successfully signed in
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                Log.d(TAG,""+user);
+
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+
+            } else {
+                // Sign in failed, check response for error code
+                System.exit(1);
+            }
+        }
+    }
+
 
 }
