@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     Time timeStart, timeEnd, duration, currTime;
 
     SharedPreferences SP;
-    SharedPreferences.Editor SPedit;
+    SharedPreferences.Editor SPEdit;
 
     static DatabaseReference mDatabase;
     FirebaseUser currentUser;
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "xx";
 
-    final String DBdateFormat = "%y-%m-%d_%H-%M-%S";
+    final String DBDateFormat = "%y-%m-%d_%H-%M-%S";
 
     String username = "";
 
@@ -118,14 +118,13 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         if(currentUser!=null) {
-            Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
-            Log.d(TAG, "EMAIL: " + currentUser.getEmail());
+            //Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
+            //Log.d(TAG, "EMAIL: " + currentUser.getEmail());
             if (currentUser.getEmail() != null && !Objects.equals(currentUser.getEmail(), ""))
                 TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
             username = Objects.requireNonNull(currentUser.getDisplayName()).split(" ")[0];
         }    //Log.d(TAG, "is test Device:"+ TestDevice);
         if (TestDevice) mDatabase = mDatabase.child("!Test");
-
 
         fab();
 
@@ -135,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
         currTime = initTime();
 
         SP = PreferenceManager.getDefaultSharedPreferences(this);
-        SPedit = SP.edit();
-        SPedit.apply();
+        SPEdit = SP.edit();
+        SPEdit.apply();
 
         /*username = SP.getString("Fahrer","Kein Fahrer");
         if (Objects.equals(username, "")){
@@ -148,9 +147,9 @@ public class MainActivity extends AppCompatActivity {
         mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                SPedit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
-                SPedit.putString("lastKm", String.valueOf(dataSnapshot.child("lastKm").getValue()));
-                SPedit.putString("lastLoc", String.valueOf(dataSnapshot.child("lastLoc").getValue()));
+                SPEdit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
+                SPEdit.putString("lastKm", String.valueOf(dataSnapshot.child("lastKm").getValue()));
+                SPEdit.putString("lastLoc", String.valueOf(dataSnapshot.child("lastLoc").getValue()));
             }
 
             @Override
@@ -165,14 +164,14 @@ public class MainActivity extends AppCompatActivity {
 
         timeStart.set(SP.getLong("timeStart",2000));
 
-        if(timeStart.toMillis(false)!=2000) {
+        if(timeStart.toMillis(false)>2000) {
             started = true;
-            Log.i("xxx",""+"timeStart.toMillis(false)!=2000");
+            Log.i(TAG,""+"timeStart.toMillis(false)>2000");
             TV_start.setText(timeStart.format("Start Zeit: %d.%m.  %H:%M:%S"));
         }
 
         timeEnd.set(SP.getLong("timeEnd",2000));
-        if(timeEnd.toMillis(false)!=2000) {
+        if(timeEnd.toMillis(false)>5000) {
             started = false;
             TV_end.setText(timeEnd.format("End  Zeit: %d.%m.  %H:%M:%S"));
             duration.set(timeEnd.toMillis(false) - timeStart.toMillis(false)-3600000);
@@ -205,10 +204,10 @@ public class MainActivity extends AppCompatActivity {
             refuel();
             return true;
         }
-        if (id == R.id.action_changeUsername) {
+        /*if (id == R.id.action_changeUsername) {
             changeUsername(true);
             return true;
-        }
+        }*/
         if (id == R.id.action_analysis){
             Intent analysis_i = new Intent(this, Analysis.class);
             startActivity(analysis_i);
@@ -281,8 +280,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                SPedit.putString("StartLoc",""+editable);
-                SPedit.apply();
+                SPEdit.putString("StartLoc",""+editable);
+                SPEdit.apply();
                 addable();
 
             }
@@ -302,8 +301,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                SPedit.putString("EndLoc",""+editable);
-                SPedit.apply();
+                SPEdit.putString("EndLoc",""+editable);
+                SPEdit.apply();
                 addable();
 
             }
@@ -323,8 +322,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                SPedit.putString("StartKm",""+editable);
-                SPedit.apply();
+                SPEdit.putString("StartKm",""+editable);
+                SPEdit.apply();
                 addable();
 
             }
@@ -344,8 +343,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                SPedit.putString("EndKm",""+editable);
-                SPedit.apply();
+                SPEdit.putString("EndKm",""+editable);
+                SPEdit.apply();
                 addable();
 
             }
@@ -365,8 +364,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                SPedit.putString("drain",""+editable);
-                SPedit.apply();
+                SPEdit.putString("drain",""+editable);
+                SPEdit.apply();
                 addable();
 
             }
@@ -386,8 +385,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                SPedit.putString("speed",""+editable);
-                SPedit.apply();
+                SPEdit.putString("speed",""+editable);
+                SPEdit.apply();
                 addable();
 
             }
@@ -453,25 +452,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 timeStart.setToNow();
-                SPedit.putLong("timeStart",timeStart.toMillis(true));
-                SPedit.apply();
+                SPEdit.putLong("timeStart",timeStart.toMillis(true));
+                SPEdit.apply();
                 TV_start.setText(timeStart.format("Start Zeit: %d.%m.  %H:%M:%S"));
 
                 ET_startKm.setText(SP.getString("lastKm",""));
                 ET_startLoc.setText(SP.getString("lastLoc",""));
 
                 B_start.setEnabled(false);
+                B_stop.setEnabled(true);
 
                 startDurUpdater();
             }
         });
+        Log.d(TAG,"started: " + started);
+        if (started||(timeStart.toMillis(false)>2000)&&!(timeStart.toMillis(false)>2000)){
+            B_start.setEnabled(false);
+            B_stop.setEnabled(true);
+        }
+
         B_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 timeEnd.setToNow();
-                SPedit.putLong("timeEnd",timeEnd.toMillis(true));
-                SPedit.apply();
+                SPEdit.putLong("timeEnd",timeEnd.toMillis(true));
+                SPEdit.apply();
                 TV_end.setText(timeEnd.format("End  Zeit: %d.%m.  %H:%M:%S"));
                 started = false;
                 addable();
@@ -482,24 +488,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                SPedit.putString("lastKm",ET_endKm.getText().toString());
+                SPEdit.putString("lastKm",ET_endKm.getText().toString());
                 mDatabase.child("!SP_Sync").child("lastKm").setValue(ET_endKm.getText().toString());
-                SPedit.putString("lastLoc",ET_endLoc.getText().toString());
+                SPEdit.putString("lastLoc",ET_endLoc.getText().toString());
                 mDatabase.child("!SP_Sync").child("lastLoc").setValue(ET_endLoc.getText().toString());
-                SPedit.apply();
+                SPEdit.apply();
 
-                mDatabase.child(timeStart.format(DBdateFormat)).child("EndZeit").setValue(""+timeEnd.format(DBdateFormat));
+                mDatabase.child(timeStart.format(DBDateFormat)).child("EndZeit").setValue(""+timeEnd.format(DBDateFormat));
 
-                mDatabase.child(timeStart.format(DBdateFormat)).child("Start").setValue(""+ET_startKm.getText());
-                mDatabase.child(timeStart.format(DBdateFormat)).child("Ziel").setValue(""+ET_endKm.getText());
+                mDatabase.child(timeStart.format(DBDateFormat)).child("Start").setValue(""+ET_startKm.getText());
+                mDatabase.child(timeStart.format(DBDateFormat)).child("Ziel").setValue(""+ET_endKm.getText());
 
-                mDatabase.child(timeStart.format(DBdateFormat)).child("StartOrt").setValue(""+ET_startLoc.getText());
-                mDatabase.child(timeStart.format(DBdateFormat)).child("ZielOrt").setValue(""+ET_endLoc.getText());
+                mDatabase.child(timeStart.format(DBDateFormat)).child("StartOrt").setValue(""+ET_startLoc.getText());
+                mDatabase.child(timeStart.format(DBDateFormat)).child("ZielOrt").setValue(""+ET_endLoc.getText());
 
-                mDatabase.child(timeStart.format(DBdateFormat)).child("Geschwindigkeit").setValue(""+ET_speed.getText());
-                mDatabase.child(timeStart.format(DBdateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
+                mDatabase.child(timeStart.format(DBDateFormat)).child("Geschwindigkeit").setValue(""+ET_speed.getText());
+                mDatabase.child(timeStart.format(DBDateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
 
-                mDatabase.child(timeStart.format(DBdateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
+                mDatabase.child(timeStart.format(DBDateFormat)).child("Fahrer").setValue(username);
 
                 try {
                     Thread.sleep(50);
@@ -561,14 +567,14 @@ public class MainActivity extends AppCompatActivity {
                         //Log.d(TAG,""+key);
                         list_Item item = new list_Item();
 
-                        Time tS = TimeParser(key.getKey(),DBdateFormat);
+                        Time tS = TimeParser(key.getKey(),DBDateFormat);
                         item.settStart(tS);
 
                         if (DbVal(key,"Tanken") == null) {
                             item.setStartLoc(DbString(key,"StartOrt"));
                             item.setEndLoc(DbString(key,"ZielOrt"));
 
-                            Time tE = TimeParser(""+DbString(key,"EndZeit"),DBdateFormat);
+                            Time tE = TimeParser(""+DbString(key,"EndZeit"),DBDateFormat);
                             item.settEnd(tE);
                         }
 
@@ -613,6 +619,10 @@ public class MainActivity extends AppCompatActivity {
     private void startDurUpdater(){
 
         started = true;
+
+        B_stop.setEnabled(true);
+        B_start.setEnabled(false);
+
         @SuppressLint("HandlerLeak") final Handler updater = new Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -622,15 +632,6 @@ public class MainActivity extends AppCompatActivity {
                 TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));
             }
         };
-
-        /*static class updater extends Handler{
-
-            @Override
-            public void handleMessage(Message msg){
-
-            }
-
-        }*/
 
         new Thread( new Runnable() {
             @Override
@@ -662,8 +663,8 @@ public class MainActivity extends AppCompatActivity {
         duration.set(2000);
         currTime.set(2000);
 
-        SPedit.putLong("timeStart",timeStart.toMillis(true));
-        SPedit.putLong("timeEnd",timeStart.toMillis(true));
+        SPEdit.putLong("timeStart",timeStart.toMillis(true));
+        SPEdit.putLong("timeEnd",timeStart.toMillis(true));
 
         ET_startLoc.setText("");
         ET_endLoc.setText("");
@@ -699,7 +700,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void changeUsername(Boolean abortable) {
+    /*private void changeUsername(Boolean abortable) {
 
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Name ändern");
@@ -712,8 +713,8 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
-                SPedit.putString("Fahrer",edittext.getText().toString());
-                SPedit.apply();
+                SPEdit.putString("Fahrer",edittext.getText().toString());
+                SPEdit.apply();
 
                 if(edittext.getText().toString().length()<3){
                     changeUsername(false);
@@ -735,7 +736,7 @@ public class MainActivity extends AppCompatActivity {
 
         alert.show();
 
-    }
+    }*/
 
     private void refuel(){
 
@@ -743,7 +744,7 @@ public class MainActivity extends AppCompatActivity {
 
         alert.setTitle("Tanken");
 
-        View alertView = getLayoutInflater().inflate(R.layout.refuel,null);
+        @SuppressLint("InflateParams") View alertView = getLayoutInflater().inflate(R.layout.refuel,null);
 
         final EditText startKm = alertView.findViewById(R.id.etStart);
         final EditText endKm = alertView.findViewById(R.id.etEnd);
@@ -764,21 +765,21 @@ public class MainActivity extends AppCompatActivity {
 
                 //mDatabase.child(t.format(dateFormat)).child("EndZeit").setValue(""+timeEnd.format(dateFormat));
 
-                mDatabase.child(t.format(DBdateFormat)).child("Start").setValue(""+startKm.getText());
-                mDatabase.child(t.format(DBdateFormat)).child("Ziel").setValue(""+endKm.getText());
+                mDatabase.child(t.format(DBDateFormat)).child("Start").setValue(""+startKm.getText());
+                mDatabase.child(t.format(DBDateFormat)).child("Ziel").setValue(""+endKm.getText());
 
                 //mDatabase.child(t.format(dateFormat)).child("StartOrt").setValue(""+ET_startLoc.getText());
                 //mDatabase.child(t.format(dateFormat)).child("ZielOrt").setValue(""+ET_endLoc.getText());
 
-                mDatabase.child(t.format(DBdateFormat)).child("Geschwindigkeit").setValue(""+speed.getText());
-                mDatabase.child(t.format(DBdateFormat)).child("Verbrauch").setValue(""+drain.getText());
+                mDatabase.child(t.format(DBDateFormat)).child("Geschwindigkeit").setValue(""+speed.getText());
+                mDatabase.child(t.format(DBDateFormat)).child("Verbrauch").setValue(""+drain.getText());
 
-                mDatabase.child(t.format(DBdateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
-                mDatabase.child(t.format(DBdateFormat)).child("Preis").setValue(""+price.getText());
-                mDatabase.child(t.format(DBdateFormat)).child("Tanken").setValue(true);
+                mDatabase.child(t.format(DBDateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
+                mDatabase.child(t.format(DBDateFormat)).child("Preis").setValue(""+price.getText());
+                mDatabase.child(t.format(DBDateFormat)).child("Tanken").setValue(true);
 
-                SPedit.putString("lastRefuel",endKm.getText().toString());
-                SPedit.apply();
+                SPEdit.putString("lastRefuel",endKm.getText().toString());
+                SPEdit.apply();
                 mDatabase.child("!SP_Sync").child("lastRefuel").setValue(endKm.getText().toString());
 
             }
@@ -882,5 +883,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*@Override
+    protected void onStop() {
+        super.onStop();
 
+        //SP.getBoolean("started",false);
+        SPEdit.putBoolean("started", started);
+
+
+    }*/
 }
