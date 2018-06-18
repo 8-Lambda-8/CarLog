@@ -691,7 +691,9 @@ public class MainActivity extends AppCompatActivity {
                 Objects.equals(ET_startKm.getText().toString(), "")||
                 Objects.equals(ET_endKm.getText().toString(), "")||
                 Objects.equals(ET_drain.getText().toString(), "")||
-                Objects.equals(ET_speed.getText().toString(), "")
+                Objects.equals(ET_speed.getText().toString(), "")||
+                timeEnd.toMillis(false)<=20000||
+                timeStart.toMillis(false)<=20000
                 ){
             B_add.setEnabled(false);
         }else{
@@ -700,43 +702,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*private void changeUsername(Boolean abortable) {
 
-        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Name ändern");
-
-        final EditText edittext = new EditText(getApplicationContext());
-        alert.setView(edittext);
-
-        edittext.setText(SP.getString("Fahrer",""));
-
-        alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-                SPEdit.putString("Fahrer",edittext.getText().toString());
-                SPEdit.apply();
-
-                if(edittext.getText().toString().length()<3){
-                    changeUsername(false);
-                }
-
-            }
-        });
-
-        alert.setCancelable(false);
-
-        if(abortable) {
-            alert.setCancelable(true);
-            alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // what ever you want to do with No option.
-                }
-            });
-        }
-
-        alert.show();
-
-    }*/
 
     private void refuel(){
 
@@ -774,7 +740,7 @@ public class MainActivity extends AppCompatActivity {
                 mDatabase.child(t.format(DBDateFormat)).child("Geschwindigkeit").setValue(""+speed.getText());
                 mDatabase.child(t.format(DBDateFormat)).child("Verbrauch").setValue(""+drain.getText());
 
-                mDatabase.child(t.format(DBDateFormat)).child("Fahrer").setValue(SP.getString("Fahrer","Kein Fahrer"));
+                mDatabase.child(t.format(DBDateFormat)).child("Fahrer").setValue(username);
                 mDatabase.child(t.format(DBDateFormat)).child("Preis").setValue(""+price.getText());
                 mDatabase.child(t.format(DBDateFormat)).child("Tanken").setValue(true);
 
@@ -883,13 +849,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*@Override
-    protected void onStop() {
-        super.onStop();
-
-        //SP.getBoolean("started",false);
-        SPEdit.putBoolean("started", started);
-
-
-    }*/
 }
