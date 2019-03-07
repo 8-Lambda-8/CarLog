@@ -1,9 +1,15 @@
 package com.a8lambda8.carlog;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -66,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
 
-    private static final String TAG = "xx";
+    public static final String TAG = "xx";
 
     final String DBDateFormat = "%y-%m-%d_%H-%M-%S";
 
@@ -101,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         if(currentUser==null) {
 
             //List<AuthUI.IdpConfig> providers = Arrays.asList(
-            List<AuthUI.IdpConfig> providers = Collections.singletonList(
+            @SuppressLint("WrongConstant") List<AuthUI.IdpConfig> providers = Collections.singletonList(
                     //new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                     //new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build());
@@ -146,14 +152,14 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 SPEdit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
                 SPEdit.putString("lastKm", String.valueOf(dataSnapshot.child("lastKm").getValue()));
                 SPEdit.putString("lastLoc", String.valueOf(dataSnapshot.child("lastLoc").getValue()));
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
@@ -226,6 +232,40 @@ public class MainActivity extends AppCompatActivity {
                             System.exit(1);
                         }
                     });
+        }
+
+        if(id == R.id.action_registerBT){
+
+            ComponentName receiver = new ComponentName(MainActivity.this, CarConnectionReceiver.class);
+            PackageManager pm = MainActivity.this.getPackageManager();
+
+
+            int notifyID = 1;
+            String CHANNEL_ID = "my_channel_01";// The id of the channel.
+            CharSequence name = getString(R.string.channel_name);// The user-visible name of the channel.
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            // Create a notification and set the notification channel.
+            Notification notification = new Notification.Builder(MainActivity.this)
+                    .setContentTitle("Hello Register")
+                    .setContentText("Hello Register")
+                    .setSmallIcon(R.drawable.up)
+                    .setChannelId(CHANNEL_ID)
+                    .build();
+
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.createNotificationChannel(mChannel);
+
+            mNotificationManager.notify(notifyID , notification);
+
+
+            pm.setComponentEnabledSetting(receiver,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
+
+            Log.d(TAG,"REGISTERED");
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -559,11 +599,11 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ItemList.clear();
 
                 for (DataSnapshot key : dataSnapshot.getChildren()) {
-                    if (!key.getKey().contains("!")){
+                    if (!Objects.requireNonNull(key.getKey()).contains("!")){
                         //Log.d(TAG,""+key);
                         list_Item item = new list_Item();
 
@@ -603,7 +643,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
@@ -702,8 +742,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     private void refuel(){
 
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -794,7 +832,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
         }
     };
 
@@ -848,5 +885,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }

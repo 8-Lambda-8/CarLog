@@ -62,5 +62,6 @@
         <item>Leni</item>
         <item>Andere</item>
     </string-array>
+    <string name="channel_name">CarLogChannel</string>
 
 </resources>
