@@ -35,11 +35,11 @@
     <string name="fahrer">Fahrer: </string>
 
     <!--Dummy data:-->
-        <string name="_15_09_17_22_58" translatable="false">15.09.17 22:58</string>
-        <string name="dauer_22_32" translatable="false">Dauer: 22:32</string>
-        <string name="_4_6_l_100km" translatable="false">4.6 L/100km</string>
-        <string name="_80_km_h" translatable="false">80 km/h</string>
-        <string name="_20_km" translatable="false">20 km</string>
+    <string name="_15_09_17_22_58" translatable="false">15.09.17 22:58</string>
+    <string name="dauer_22_32" translatable="false">Dauer: 22:32</string>
+    <string name="_4_6_l_100km" translatable="false">4.6 L/100km</string>
+    <string name="_80_km_h" translatable="false">80 km/h</string>
+    <string name="_20_km" translatable="false">20 km</string>
     <string name="zeitbereich">Zeitbereich:</string>
     <string name="art_des_eintrags">Art des Eintrags:</string>
     <string name="selectTime">Select Time</string>
@@ -63,5 +63,7 @@
         <item>Andere</item>
     </string-array>
     <string name="channel_name">CarLogChannel</string>
+    <string name="title_activity_car_log_auto">CarLogAutoActivity</string>
+    <string name="km_picker_def" translatable="false">2</string>
 
 </resources>

@@ -1,11 +1,9 @@
 package com.a8lambda8.carlog;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -49,6 +47,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -101,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Intent intent = getIntent();
+
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         currentUser = mAuth.getCurrentUser();
@@ -134,6 +135,20 @@ public class MainActivity extends AppCompatActivity {
 
         fab();
 
+        /*BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+        if (pairedDevices.size() > 0) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                String deviceHardwareAddress = device.getAddress(); // MAC address
+                Log.d(TAG,"BT: "+deviceName+" "+deviceHardwareAddress);
+            }
+        }*/
+
+
+
         timeStart = initTime();
         timeEnd = initTime();
         duration = initTime();
@@ -148,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
             changeUsername(false);
             username = SP.getString("Fahrer","Kein Fahrer");
         }*/
-
 
         mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
@@ -165,6 +179,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         init();
+        Log.d(TAG,intent.getAction()+"\n"+intent.getDataString()+"\n"+intent.getData());
+        if(intent.getBooleanExtra("fromReceiver",false)){
+            Log.d(TAG,"Started By BT");
+            B_start.callOnClick();
+        }
 
         started = SP.getBoolean("started",false);
 
@@ -236,7 +255,14 @@ public class MainActivity extends AppCompatActivity {
 
         if(id == R.id.action_registerBT){
 
-            ComponentName receiver = new ComponentName(MainActivity.this, CarConnectionReceiver.class);
+
+
+            ComponentName receiver = new ComponentName(MainActivity.this, CarLogAutoReceiver.class);
+            PackageManager pm = MainActivity.this.getPackageManager();
+            pm.setComponentEnabledSetting(receiver,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
+            /*ComponentName receiver = new ComponentName(MainActivity.this, CarConnectionReceiver.class);
             PackageManager pm = MainActivity.this.getPackageManager();
 
 
@@ -264,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                     PackageManager.DONT_KILL_APP);
 
-            Log.d(TAG,"REGISTERED");
+            Log.d(TAG,"REGISTERED");*/
 
         }
 

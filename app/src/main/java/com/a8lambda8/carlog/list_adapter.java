@@ -114,7 +114,7 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             }
 
             if(driver!=null) {
-                driver.setText(context.getString(R.string.fahrer)+ item.getDriverName());
+                driver.setText(context.getString(R.string.fahrer)+" "+ item.getDriverName());
             }
 
             if(IVrefuel!=null){

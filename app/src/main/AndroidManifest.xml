@@ -4,16 +4,16 @@
     package="com.a8lambda8.carlog">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning"
-        android:fullBackupContent="true">
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -42,14 +42,36 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.a8lambda8.carlog.MainActivity" />
         </activity>
+
         <receiver android:name=".CarConnectionReceiver">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".onBootReceiver" >
+        <receiver android:name=".onBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
+        <service android:name=".CarLogAutoService" />
+
+        <receiver android:name=".CarLogAutoReceiver"
+            android:permission=""
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.a8lambda8.carlog.ACTION_MESSAGE_READ" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".CarLogAutoReplyReceiver"
+            android:permission=""
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.a8lambda8.carlog.ACTION_MESSAGE_REPLY" />
             </intent-filter>
         </receiver>
     </application>

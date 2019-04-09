@@ -29,4 +29,8 @@
     <string name="l_schen">Löschen</string>
     <string name="geschwindigkeit" translatable="false">Ø Geschwindigkeit</string>
     <string name="ende_km">ende km</string>
+    <string name="richtung">Richtung:</string>
+    <string name="logOut">logOut</string>
+    <string name="channel_name">CarLogChannel</string>
+    <string name="title_activity_car_log_auto">CarLogAutoActivity</string>
 </resources>

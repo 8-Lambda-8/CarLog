@@ -41,7 +41,7 @@ public class CarConnectionReceiver extends BroadcastReceiver {
             Log.d(TAG, "Disconnected");
         }
 
-        if(device.getName().equals("JAKOB-LAPTOP")||device.getName().equals("SEAT BT Jakob")){
+        if(device.getName().equals("JAKOB-LAPTOP")||device.getName().equals("SEAT BT Jakob")||device.getAddress().equals("9C:8D:7C:C4:13:FE")){
             Intent main = new Intent(context, MainActivity.class);
             main.putExtra("fromReceiver",true);
             context.startActivity(main);
