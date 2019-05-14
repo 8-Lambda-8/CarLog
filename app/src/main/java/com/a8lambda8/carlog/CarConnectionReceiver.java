@@ -43,7 +43,8 @@ public class CarConnectionReceiver extends BroadcastReceiver {
 
         if(device.getName().equals("JAKOB-LAPTOP")||device.getName().equals("SEAT BT Jakob")||device.getAddress().equals("9C:8D:7C:C4:13:FE")){
             Intent main = new Intent(context, MainActivity.class);
-            main.putExtra("fromReceiver",true);
+            if(device.getName().equals("SEAT BT Jakob"))
+                main.putExtra("fromReceiver",true);
             context.startActivity(main);
         }
     }

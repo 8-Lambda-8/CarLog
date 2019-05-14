@@ -54,13 +54,13 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
+        <!--<meta-data
             android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
+            android:resource="@xml/automotive_app_desc" />-->
 
-        <service android:name=".CarLogAutoService" />
+        <!--<service android:name=".CarLogAutoService" />-->
 
-        <receiver android:name=".CarLogAutoReceiver"
+        <!--<receiver android:name=".CarLogAutoReceiver"
             android:permission=""
             tools:ignore="ExportedReceiver">
             <intent-filter>
@@ -73,7 +73,7 @@
             <intent-filter>
                 <action android:name="com.a8lambda8.carlog.ACTION_MESSAGE_REPLY" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
     </application>
 
 </manifest>

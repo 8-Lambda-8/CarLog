@@ -1,8 +1,6 @@
 package com.a8lambda8.carlog;
 
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,7 +45,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -123,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+            mDatabase = FirebaseDatabase.getInstance().getReference();
         if(currentUser!=null) {
             //Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
             //Log.d(TAG, "EMAIL: " + currentUser.getEmail());
@@ -164,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             username = SP.getString("Fahrer","Kein Fahrer");
         }*/
 
-        mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
+            mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 SPEdit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
@@ -461,23 +458,26 @@ public class MainActivity extends AppCompatActivity {
         ET_startKm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new KMpicker(MainActivity.this,Integer.parseInt(ET_startKm.getText().toString()), Handler, "Start KM eingeben:",2);
+                if(started) {
+                    new KMpicker(MainActivity.this, Integer.parseInt(ET_startKm.getText().toString()), Handler, "Start KM eingeben:", 2);
+                }
             }
         });
         ET_endKm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int in = 0;
-                Log.i("xxx","asd "+ET_endKm.getText());
-                if(ET_endKm.getText()!=null&& !Objects.equals(ET_endKm.getText().toString(), "")){
-                    in = Integer.parseInt(ET_endKm.getText().toString());
+                if(started) {
+                    Log.i("xxx", "asd " + ET_endKm.getText());
+                    if (ET_endKm.getText() != null && !Objects.equals(ET_endKm.getText().toString(), "")) {
+                        in = Integer.parseInt(ET_endKm.getText().toString());
+                    }
+                    Log.i("xxx", "in:" + in);
+                    if (in <= 0) {
+                        in = Integer.parseInt(ET_startKm.getText().toString());
+                    }
+                    new KMpicker(MainActivity.this, in, Handler, "End KM eingeben:", 3);
                 }
-                Log.i("xxx","in:"+in);
-                if (in<=0){
-                    in = Integer.parseInt(ET_startKm.getText().toString());
-                }
-                new KMpicker(MainActivity.this,in, Handler, "End KM eingeben:",3);
-
             }
         });
 
@@ -639,7 +639,6 @@ public class MainActivity extends AppCompatActivity {
                         if (DbVal(key,"Tanken") == null) {
                             item.setStartLoc(DbString(key,"StartOrt"));
                             item.setEndLoc(DbString(key,"ZielOrt"));
-
                             Time tE = TimeParser(""+DbString(key,"EndZeit"),DBDateFormat);
                             item.settEnd(tE);
                         }
@@ -793,6 +792,9 @@ public class MainActivity extends AppCompatActivity {
                 Time t = initTime();
                 t.setToNow();
 
+                mDatabase.child(t.format(DBDateFormat)).child("Tanken").setValue(true);
+
+
                 //mDatabase.child(t.format(dateFormat)).child("EndZeit").setValue(""+timeEnd.format(dateFormat));
 
                 mDatabase.child(t.format(DBDateFormat)).child("Start").setValue(""+startKm.getText());
@@ -806,7 +808,7 @@ public class MainActivity extends AppCompatActivity {
 
                 mDatabase.child(t.format(DBDateFormat)).child("Fahrer").setValue(username);
                 mDatabase.child(t.format(DBDateFormat)).child("Preis").setValue(""+price.getText());
-                mDatabase.child(t.format(DBDateFormat)).child("Tanken").setValue(true);
+
 
                 SPEdit.putString("lastRefuel",endKm.getText().toString());
                 SPEdit.apply();

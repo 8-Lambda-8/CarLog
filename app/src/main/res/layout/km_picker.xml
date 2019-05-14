@@ -103,10 +103,10 @@
         android:layout_column="0"
         android:layout_columnWeight="1"
 
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:allowUndo="false"
         android:text="@string/km_picker_def"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:textSize="24sp" />
 
     <TextView
@@ -118,10 +118,10 @@
         android:layout_column="1"
         android:layout_columnWeight="1"
 
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:allowUndo="false"
         android:text="@string/km_picker_def"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:textSize="24sp" />
 
     <TextView
@@ -133,10 +133,10 @@
         android:layout_column="2"
         android:layout_columnWeight="1"
 
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:allowUndo="false"
         android:text="@string/km_picker_def"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:textSize="24sp" />
 
     <TextView
@@ -148,10 +148,10 @@
         android:layout_column="3"
         android:layout_columnWeight="1"
 
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:allowUndo="false"
         android:text="@string/km_picker_def"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:textSize="24sp" />
 
     <TextView
@@ -163,10 +163,10 @@
         android:layout_column="4"
         android:layout_columnWeight="1"
 
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:allowUndo="false"
         android:text="@string/km_picker_def"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:textSize="24sp" />
 
     <TextView
@@ -178,10 +178,10 @@
         android:layout_column="5"
         android:layout_columnWeight="1"
 
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:allowUndo="false"
         android:text="@string/km_picker_def"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:textSize="24sp" />
 
     <Button
