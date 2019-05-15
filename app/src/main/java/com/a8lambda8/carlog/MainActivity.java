@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "xx";
 
-    final String DBDateFormat = "%y-%m-%d_%H-%M-%S";
+    String DBDateFormat;
 
     String username = "";
 
@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        DBDateFormat = getString(R.string.db_dateformat);
 
         currentUser = mAuth.getCurrentUser();
         if(currentUser==null) {
@@ -250,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
-        if(id == R.id.action_registerBT){
+        /*if(id == R.id.action_registerBT){
 
 
 
@@ -258,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
             PackageManager pm = MainActivity.this.getPackageManager();
             pm.setComponentEnabledSetting(receiver,
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
+                    PackageManager.DONT_KILL_APP);*/
             /*ComponentName receiver = new ComponentName(MainActivity.this, CarConnectionReceiver.class);
             PackageManager pm = MainActivity.this.getPackageManager();
 
@@ -289,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d(TAG,"REGISTERED");*/
 
-        }
+        //}
 
         return super.onOptionsItemSelected(item);
     }

@@ -22,8 +22,8 @@ android {
         applicationId "com.a8lambda8.carlog"
         minSdkVersion 26
         targetSdkVersion 28
-        versionCode 26
-        versionName "1.4"
+        versionCode 15
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config
     }

@@ -20,7 +20,7 @@ public class onBootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
 
-        Toast.makeText(context,"Hello from onBoot",
+        /*Toast.makeText(context,"Hello from onBoot",
                 Toast.LENGTH_SHORT).show();
 
         int notifyID = 1;
@@ -40,7 +40,7 @@ public class onBootReceiver extends BroadcastReceiver {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.createNotificationChannel(mChannel);
 
-        mNotificationManager.notify(notifyID , notification);
+        mNotificationManager.notify(notifyID , notification);*/
 
 
 

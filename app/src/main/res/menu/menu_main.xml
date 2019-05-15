@@ -33,9 +33,9 @@
         android:title="@string/logOut"
         app:showAsAction="never"
         />
-    <item
+    <!--<item
         android:id="@+id/action_registerBT"
         android:orderInCategory="100"
         android:title="register Bluetooth"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" />-->
 </menu>

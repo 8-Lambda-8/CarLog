@@ -161,6 +161,7 @@
         tools:layout_editor_absoluteX="192dp"
         tools:layout_editor_absoluteY="0dp" />
 
+    <!--android.support.v7.widget.RecyclerView-->
     <ListView
         android:id="@+id/fahrten"
         android:layout_width="0dp"
