@@ -8,11 +8,13 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.TabLayout;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.TimePicker;
 
 import java.util.Objects;
@@ -24,8 +26,11 @@ import java.util.Objects;
 
 class TIME_picker {
 
-    TIME_picker(Activity parent, final Time in, final Handler mResponseHandler, String title, final int x){
+    private Button B_now;
+    private TimePicker TP;
+    private DatePicker DP;
 
+    TIME_picker(Activity parent, final Time in, final Handler mResponseHandler, String title, final int x){
 
         final Time out = new Time(Time.getCurrentTimezone());
         final Time now = new Time(Time.getCurrentTimezone());
@@ -40,17 +45,37 @@ class TIME_picker {
         View alertView = Objects.requireNonNull(inflater).inflate(R.layout.time_picker_layout,null);
         alert.setView(alertView);
 
+        TabLayout tabLayout = alertView.findViewById(R.id.tabLayout);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
 
-        final TimePicker TP = alertView.findViewById(R.id.timePicker);
+                if(tab.getPosition()==0){
+                    B_now.setVisibility(View.VISIBLE);
+                    TP.setVisibility(View.VISIBLE);
+                    DP.setVisibility(View.GONE);
+                }
+                else if(tab.getPosition()==1)
+                {
+                    B_now.setVisibility(View.GONE);
+                    TP.setVisibility(View.GONE);
+                    DP.setVisibility(View.VISIBLE);
+                }
 
-        TP.setIs24HourView(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            TP.setHour(in.hour);
-            TP.setMinute(in.minute);
-        }
+            }
 
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
 
-        Button B_now = alertView.findViewById(R.id.b_now);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        B_now = alertView.findViewById(R.id.b_now);
         B_now.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
@@ -64,14 +89,18 @@ class TIME_picker {
             }
         });
 
+        TP = alertView.findViewById(R.id.timePicker);
+
+        TP.setIs24HourView(true);
+        TP.setHour(in.hour);
+        TP.setMinute(in.minute);
+
         TP.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                out.set(0,selectedMinute,selectedHour, now.monthDay, now.month, now.year);
+                out.set(0,selectedMinute,selectedHour, out.monthDay, out.month, out.year);
             }
         });
-
-
 
         alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -85,6 +114,16 @@ class TIME_picker {
 
             }
         });
+
+        DP = alertView.findViewById(R.id.datePicker);
+        DP.updateDate(in.year,in.month,in.monthDay);
+        DP.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                out.set(0,out.minute,out.hour, dayOfMonth, monthOfYear, year);
+            }
+        });
+
 
         alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
             @Override
