@@ -1,11 +1,9 @@
 package com.a8lambda8.carlog;
 
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
+import android.util.ArraySet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,9 +41,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences SP;
     SharedPreferences.Editor SPEdit;
 
+    FirebaseAuth mAuth;
+
     static DatabaseReference mDatabase;
     FirebaseUser currentUser;
 
@@ -76,19 +80,8 @@ public class MainActivity extends AppCompatActivity {
 
     static boolean TestDevice = true;
 
-    public static final String[] AutoComplete = new String[]{
-            "Bach", "Berwang", "Schattwald", "Stanzach",
-            "Biberwier", "Bichlbach", "Breitenwang",
-            "Ehenbichl", "Ehrwald", "Elbigenalp", "Elmen",
-            "Forchach", "Grän", "Gramais", "Häselgehr",
-            "Heiterwang", "Hinterhornbach", "Höfen", "Holzgau",
-            "Jungholz", "Kaisers", "Lechaschau", "Lermoos",
-            "Musau", "Namlos", "Nesselwängle", "Pfafflar",
-            "Pflach", "Pinswang", "Reutte", "Steeg",
-            "Tannheim", "Vils", "Vorderhornbach", "Wängle",
-            "Weißenbach am Lech", "Zöblen", "Innsbruck", "Imst",
-            "Grünau", "Stockach",
-    };
+    public List<String> AutoComplete = new ArrayList<>();
+    ArrayAdapter<String> autoCompleteAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         DBDateFormat = getString(R.string.db_dateformat);
 
@@ -110,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("WrongConstant") List<AuthUI.IdpConfig> providers = Collections.singletonList(
                     //new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                     //new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
-                    new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build());
+                    new AuthUI.IdpConfig.GoogleBuilder().build());
 
             // Create and launch sign-in intent
             startActivityForResult(
@@ -146,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }*/
 
-
-
         timeStart = initTime();
         timeEnd = initTime();
         duration = initTime();
@@ -157,13 +148,61 @@ public class MainActivity extends AppCompatActivity {
         SPEdit = SP.edit();
         SPEdit.apply();
 
-        /*username = SP.getString("Fahrer","Kein Fahrer");
-        if (Objects.equals(username, "")){
-            changeUsername(false);
-            username = SP.getString("Fahrer","Kein Fahrer");
-        }*/
 
-            mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
+        autoCompleteAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, AutoComplete);
+
+        /*AutoComplete.addAll(Arrays.asList("Bach", "Berwang", "Schattwald", "Stanzach",
+                "Biberwier", "Bichlbach", "Breitenwang",
+                "Ehenbichl", "Ehrwald", "Elbigenalp", "Elmen",
+                "Forchach", "Grän", "Gramais", "Häselgehr",
+                "Heiterwang", "Hinterhornbach", "Höfen", "Holzgau",
+                "Jungholz", "Kaisers", "Lechaschau", "Lermoos",
+                "Musau", "Namlos", "Nesselwängle", "Pfafflar",
+                "Pflach", "Pinswang", "Reutte", "Steeg",
+                "Tannheim", "Vils", "Vorderhornbach", "Wängle",
+                "Weißenbach am Lech", "Zöblen", "Innsbruck", "Imst",
+                "Grünau", "Stockach"));*/
+
+        final Set<String> def = new ArraySet<>();
+        def.add("Elbigenalp");
+        def.add("!!Default Values");
+
+        AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
+        autoCompleteAdapter.setNotifyOnChange(true);
+
+
+        mDatabase.child("!locations").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                AutoComplete.clear();
+                //autoCompleteAdapter.clear();
+                Set<String> loc = new ArraySet<>();
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    loc.add((String) postSnapshot.getValue());
+                }
+
+                SPEdit.putStringSet("!locations",loc);
+                SPEdit.apply();
+
+                AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
+
+                updateAutoCompleteAdapter();
+
+                Log.d(TAG,"Loaded Locations:\n"+AutoComplete);
+                Log.d(TAG,"AutoComplete cnt: "+AutoComplete.size());
+                Log.d(TAG,"Adapter cnt: "+autoCompleteAdapter.getCount());
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        mDatabase.child("!SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 SPEdit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
@@ -178,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         init();
-        Log.d(TAG,intent.getAction()+"\n"+intent.getDataString()+"\n"+intent.getData());
+        //Log.d(TAG,intent.getAction()+"\n"+intent.getDataString()+"\n"+intent.getData());
         if(intent.getBooleanExtra("fromReceiver",false)){
             Log.d(TAG,"Started By BT");
             B_start.callOnClick();
@@ -190,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(timeStart.toMillis(false)>2000) {
             started = true;
-            Log.i(TAG,""+"timeStart.toMillis(false)>2000");
+            //Log.i(TAG,""+"timeStart.toMillis(false)>2000");
             TV_start.setText(timeStart.format("Start Zeit: %d.%m.  %H:%M:%S"));
         }
 
@@ -242,19 +281,33 @@ public class MainActivity extends AppCompatActivity {
             startActivity(analysis_i);
             return true;
         }
+        if (id == R.id.action_testMenu){
+            /*Intent analysis_i = new Intent(this, TestMenu.class);
+            startActivity(analysis_i);*/
+
+
+            //mDatabase.child("!Test/!locations").setValue(AutoComplete);
+
+            return true;
+        }
         if(id == R.id.action_logOut){
             AuthUI.getInstance()
-                    .signOut(this)
+                    .signOut(MainActivity.this)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         public void onComplete(@NonNull Task<Void> task) {
-                            System.exit(1);
+
+                            try {
+                                mAuth.signOut();
+                            } catch (Exception e){
+                                Log.e(TAG,e.getMessage());
+                            }
+
+                            /*System.exit(1);*/
                         }
                     });
         }
 
         /*if(id == R.id.action_registerBT){
-
-
 
             ComponentName receiver = new ComponentName(MainActivity.this, CarLogAutoReceiver.class);
             PackageManager pm = MainActivity.this.getPackageManager();
@@ -318,9 +371,10 @@ public class MainActivity extends AppCompatActivity {
         ET_drain = findViewById(R.id.et_drain);
         ET_speed = findViewById(R.id.et_speed);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, AutoComplete);
-        ET_endLoc.setAdapter(adapter);
+
+
+        ET_endLoc.setAdapter(autoCompleteAdapter);
+
 
 
         ET_startLoc.setText(SP.getString("StartLoc",""));
@@ -460,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
         ET_startKm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(started) {
+                if(!B_start.isEnabled()) {
                     new KMpicker(MainActivity.this, Integer.parseInt(ET_startKm.getText().toString()), Handler, "Start KM eingeben:", 2);
                 }
             }
@@ -469,7 +523,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int in = 0;
-                if(started) {
+                if(!B_start.isEnabled()) {
                     Log.i("xxx", "asd " + ET_endKm.getText());
                     if (ET_endKm.getText() != null && !Objects.equals(ET_endKm.getText().toString(), "")) {
                         in = Integer.parseInt(ET_endKm.getText().toString());
@@ -574,6 +628,19 @@ public class MainActivity extends AppCompatActivity {
                 mDatabase.child(timeStart.format(DBDateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
 
                 mDatabase.child(timeStart.format(DBDateFormat)).child("Fahrer").setValue(username);
+
+                if (AutoComplete.contains(ET_endLoc.getText().toString())) {
+                    Log.d(TAG,"AutoComplete has "+ET_endLoc.getText());
+                } else {
+                    Log.d(TAG,"AutoComplete hasn't "+ET_endLoc.getText());
+
+                    AutoComplete.add(ET_endLoc.getText().toString());
+                    //autoCompleteAdapter.notify();
+
+
+
+                    mDatabase.child("!locations").setValue(AutoComplete);
+                }
 
                 try {
                     Thread.sleep(50);
@@ -915,4 +982,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    void updateAutoCompleteAdapter(){
+        autoCompleteAdapter.clear();
+        autoCompleteAdapter.addAll(AutoComplete);
+    }
+
 }

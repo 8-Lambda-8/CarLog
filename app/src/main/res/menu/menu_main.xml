@@ -28,6 +28,12 @@
         android:title="@string/ListWithFilter"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_testMenu"
+        android:orderInCategory="100"
+        android:title="@string/testMenu"
+        app:showAsAction="never"
+        />
+    <item
         android:id="@+id/action_logOut"
         android:orderInCategory="100"
         android:title="@string/logOut"
