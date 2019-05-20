@@ -1,6 +1,7 @@
 package com.a8lambda8.carlog;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static com.a8lambda8.carlog.MainActivity.mDatabase;
@@ -50,7 +52,7 @@ public class FilterList extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_ok);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,6 +119,42 @@ public class FilterList extends AppCompatActivity {
         listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems(),false);
         LV.setAdapter(listAdapter);
 
+        LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent EntryEditor_i = new Intent(FilterList.this, EntryEditor.class);
+
+                /*if (listAdapter.reverse)
+                    position = listAdapter.ge*/
+
+                list_Item item = listAdapter.getItem(position);
+
+                EntryEditor_i.putExtra("tStart",item.gettStart().toMillis(false));
+                EntryEditor_i.putExtra("tEnd",item.gettEnd().toMillis(false));
+
+                EntryEditor_i.putExtra("StartLoc",item.getStartLoc());
+                EntryEditor_i.putExtra("EndLoc",item.getEndLoc());
+
+                EntryEditor_i.putExtra("start",item.getStart());
+                EntryEditor_i.putExtra("end",item.getEnd());
+
+                EntryEditor_i.putExtra("speed",item.getSpeed());
+                EntryEditor_i.putExtra("drain",item.getDrain());
+
+                EntryEditor_i.putExtra("driverName",item.getDriverName());
+
+
+                EntryEditor_i.putExtra("refuel",item.getRefuel());
+                EntryEditor_i.putExtra("price",item.getPrice());
+
+
+
+                startActivity(EntryEditor_i);
+
+            }
+        });
+
         ViewCompat.setNestedScrollingEnabled(LV, true);
 
     }
@@ -160,9 +198,25 @@ public class FilterList extends AppCompatActivity {
                 if (DbVal(key,"Tanken")!=null)
                     refuel = (boolean) DbVal(key,"Tanken");
 
-                if (!key.getKey().contains("!")&&
-                        (Objects.requireNonNull(key.child("Fahrer").getValue()).equals(SP_driver.getSelectedItem().toString())||SP_driver.getSelectedItemId()==0) &&
-                        (zb_beg.toMillis(false)<=TimeParser(key.getKey(),DBdateFormat).toMillis(false)&&zb_end.toMillis(false)>TimeParser(key.getKey(),DBdateFormat).toMillis(false))&&
+                //Filter ! Entrys
+                if (Objects.requireNonNull(key.getKey()).contains("!"))
+                    continue;
+
+                if(key.child("Fahrer").getValue()==null)
+                    continue;
+
+                if(!(key.child("Fahrer").getValue().equals(SP_driver.getSelectedItem().toString())
+                        ||
+                        SP_driver.getSelectedItemId()==0))
+                    continue;
+
+                if (/*!Objects.requireNonNull(key.getKey()).contains("!")*//*&&
+                        (Objects.requireNonNull(key.child("Fahrer").getValue())
+                                .equals(SP_driver.getSelectedItem().toString())
+                        ||SP_driver.getSelectedItemId()==0)*/
+                        /*&&*/ (zb_beg.toMillis(false)<=TimeParser(key.getKey()
+                                ,DBdateFormat).toMillis(false)&&zb_end.toMillis(false)>TimeParser(key.getKey()
+                                ,DBdateFormat).toMillis(false))&&
                         showRefuel(refuel)) {
                     //Log.d("xx","nr: "+n+ "     refuel_Result:"+showRefuel(refuel));
                     //n++;

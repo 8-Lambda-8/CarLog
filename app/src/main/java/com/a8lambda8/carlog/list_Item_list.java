@@ -21,9 +21,9 @@ public class list_Item_list {
         //itemcount++;
     }
 
-    /*list_Item getItem(int location) {
+    list_Item getItem(int location) {
         return itemlist.get(location);
-    }*/
+    }
 
     List<list_Item> getAllItems() {
         return itemlist;

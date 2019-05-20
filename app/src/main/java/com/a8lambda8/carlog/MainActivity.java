@@ -42,7 +42,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -74,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "xx";
 
-    String DBDateFormat;
+    static String DBDateFormat;
 
     String username = "";
 
@@ -350,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fab(){
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_ok);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

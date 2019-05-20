@@ -15,6 +15,15 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".EntryEditor"
+            android:label="@string/title_activity_entry_editor"
+            android:parentActivityName=".FilterList"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.a8lambda8.carlog.FilterList" />
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
@@ -53,27 +62,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <!--<meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />-->
-
-        <!--<service android:name=".CarLogAutoService" />-->
-
-        <!--<receiver android:name=".CarLogAutoReceiver"
-            android:permission=""
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="com.a8lambda8.carlog.ACTION_MESSAGE_READ" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".CarLogAutoReplyReceiver"
-            android:permission=""
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="com.a8lambda8.carlog.ACTION_MESSAGE_REPLY" />
-            </intent-filter>
-        </receiver>-->
     </application>
 
 </manifest>

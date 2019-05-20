@@ -39,6 +39,8 @@ public class list_adapter extends ArrayAdapter<list_Item> {
         this.reverse = reverse;
     }
 
+
+
     @SuppressLint("SetTextI18n")
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent){
@@ -134,5 +136,19 @@ public class list_adapter extends ArrayAdapter<list_Item> {
         }
 
         return v;
+    }
+
+
+    @Override
+    public list_Item getItem(int position){
+
+        list_Item i;
+
+        if(reverse)
+            i = items.get(getCount() - (position+1));
+        else
+            i = items.get(position);
+        return i;
+
     }
 }
