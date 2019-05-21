@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import static com.a8lambda8.carlog.MainActivity.TAG;
+
 /**
  * Created by Jakob Wasle on 15.09.2017.
  */
@@ -35,7 +37,7 @@ public class list_adapter extends ArrayAdapter<list_Item> {
 
     }
 
-    public void setReverse(boolean reverse) {
+    void setReverse(boolean reverse) {
         this.reverse = reverse;
     }
 
@@ -50,12 +52,25 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             v = inflater.inflate(R.layout.list_item,null);
         }
 
-        list_Item item;
-
-        if(reverse)
-            item = items.get(getCount() - (position+1));
-        else
+        list_Item item, itemLst;
+        int x = 0;
+        if(reverse) {
+            int revPos = getCount() - (position + 1);
+            item = items.get(revPos);
+            /*if(position!=0)
+                x = -1;
+            itemLst = items.get(revPos+x);*/
+            //x = 1;
+        }
+        else {
             item = items.get(position);
+            //itemLst = items.get();
+
+            /*itemLst = items.get(getCount());
+            if(position!=0)
+                //x = -1;
+                itemLst = items.get(getCount() - 1);*/
+        }
 
 
         if(item!=null){
@@ -131,7 +146,35 @@ public class list_adapter extends ArrayAdapter<list_Item> {
                 }
             }
 
+            /*Boolean eq = item.getStart()==itemLst.getEnd();
 
+            Log.d(TAG,String.format("KM: %d: start=%d last_end=%d   isEqual=%b",
+                    position,
+                    item.getStart(),
+                    item.getEnd(),//items.get(position+x).getEnd(),
+                    eq));
+
+            Log.d(TAG,String.format("lst  : start=%d last_end=%d   isEqual=%b",
+                    //position,
+                    itemLst.getStart(),
+                    itemLst.getEnd(),//items.get(position+x).getEnd(),
+                    eq));
+
+            *//*Log.d(TAG,String.format("KM: %d: start=%d last_end=%d   isEqual=%b    --last",
+                    position+x,
+                    items.get(position+x).getStart(),//item.getStart(),
+                    items.get(position+x).getEnd(),
+                    eq));*//*
+
+            Log.d(TAG," \n");
+
+            if(!eq){
+                startKM.setTextColor(Color.RED);
+            }
+
+            if(item.getStartLoc()!=itemLst.getEndLoc()){
+                start.setTextColor(Color.RED);
+            }*/
 
         }
 

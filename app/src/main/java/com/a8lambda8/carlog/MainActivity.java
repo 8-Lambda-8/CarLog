@@ -188,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
 
                 updateAutoCompleteAdapter();
 
-                Log.d(TAG,"Loaded Locations:\n"+AutoComplete);
+                /*Log.d(TAG,"Loaded Locations:\n"+AutoComplete);
                 Log.d(TAG,"AutoComplete cnt: "+AutoComplete.size());
-                Log.d(TAG,"Adapter cnt: "+autoCompleteAdapter.getCount());
+                Log.d(TAG,"Adapter cnt: "+autoCompleteAdapter.getCount());*/
 
 
             }
@@ -281,8 +281,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_testMenu){
-            /*Intent analysis_i = new Intent(this, TestMenu.class);
-            startActivity(analysis_i);*/
+            Intent analysis_i = new Intent(this, TestActivity.class);
+            startActivity(analysis_i);
 
 
             //mDatabase.child("!Test/!locations").setValue(AutoComplete);
@@ -560,6 +560,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
+
         });
 
         ////Buttons
@@ -931,23 +932,23 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    Object DbVal(DataSnapshot key,String child){
+    static Object DbVal(DataSnapshot key,String child){
         return key.child(child).getValue();
     }
 
-    int DbInt(DataSnapshot key,String child){
+    static int DbInt(DataSnapshot key,String child){
         if (DbVal(key,child)!=null)
             return Integer.valueOf(DbString(key,child));
         else return 0;
     }
 
-    String DbString(DataSnapshot key,String child){
+    static String DbString(DataSnapshot key,String child){
         if (DbVal(key,child)!=null)
             return DbVal(key,child).toString();
         else return  "";
     }
 
-    Time TimeParser(String time, String format){
+    static Time TimeParser(String time, String format){
         Time t = new Time(Time.getCurrentTimezone());
         if(format.charAt(1)=='y')
             t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),

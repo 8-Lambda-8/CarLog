@@ -69,5 +69,6 @@
     <string name="db_dateformat" translatable="false">%y-%m-%d_%H-%M-%S</string>
     <string name="testMenu" translatable="false">Test</string>
     <string name="title_activity_entry_editor">EntryEditor</string>
+    <string name="title_activity_test">TestActivity</string>
 
 </resources>

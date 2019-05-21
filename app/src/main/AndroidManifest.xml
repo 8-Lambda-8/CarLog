@@ -15,6 +15,15 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".TestActivity"
+            android:label="@string/title_activity_test"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.a8lambda8.carlog.MainActivity" />
+        </activity>
+        <activity
             android:name=".EntryEditor"
             android:label="@string/title_activity_entry_editor"
             android:parentActivityName=".FilterList"
