@@ -102,17 +102,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.67"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="258dp" />
+        app:layout_constraintGuide_percent="0.70" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="25dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/_20_km"
         app:layout_constraintBottom_toBottomOf="@+id/end"
         app:layout_constraintRight_toLeftOf="@+id/guideline3"
