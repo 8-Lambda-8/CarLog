@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-            mDatabase = FirebaseDatabase.getInstance().getReference();
+            mDatabase = FirebaseDatabase.getInstance().getReference().child("old");
         if(currentUser!=null) {
             //Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
             //Log.d(TAG, "EMAIL: " + currentUser.getEmail());
