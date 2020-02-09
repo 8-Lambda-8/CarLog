@@ -67,8 +67,12 @@
     <string name="km_picker_def" translatable="false">2</string>
 
     <string name="db_dateformat" translatable="false">%y-%m-%d_%H-%M-%S</string>
+    <string name="db_dateformat_start" translatable="false">Y%y/M%m/D%d/%H-%M-%S</string>
+
+
     <string name="testMenu" translatable="false">Test</string>
     <string name="title_activity_entry_editor">EntryEditor</string>
-    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_test" translatable="false">TestActivity</string>
+
 
 </resources>

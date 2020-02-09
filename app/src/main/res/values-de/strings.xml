@@ -33,4 +33,5 @@
     <string name="logOut">logOut</string>
     <string name="channel_name">CarLogChannel</string>
     <string name="title_activity_car_log_auto">CarLogAutoActivity</string>
+    <string name="title_activity_entry_editor">Eintrags Editor</string>
 </resources>

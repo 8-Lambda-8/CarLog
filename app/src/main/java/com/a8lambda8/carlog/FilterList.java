@@ -26,7 +26,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
 
-import static com.a8lambda8.carlog.MainActivity.mDatabase;
+import static com.a8lambda8.carlog.MainActivity.DBDateFormat_start;
+import static com.a8lambda8.carlog.MainActivity.StartTimeStringParser;
+import static com.a8lambda8.carlog.MainActivity.TimeParser;
+import static com.a8lambda8.carlog.MainActivity.mDatabase_selectedCar;
 
 public class FilterList extends AppCompatActivity {
 
@@ -166,21 +169,9 @@ public class FilterList extends AppCompatActivity {
         }
     };
 
-    Time TimeParser(String time, String format){
-        Time t = new Time(Time.getCurrentTimezone());
-        if(format.charAt(1)=='y')
-            t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
-                    Integer.parseInt(time.substring(6,8)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(0,2)));
-        else if(format.charAt(1)=='d')
-            t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
-                    Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(6,8)));
-        return t;
-    }
-
     void updateLV(){
-        mDatabase.removeEventListener(VEL);
-        mDatabase.addValueEventListener(VEL);
-
+        mDatabase_selectedCar.child("data").removeEventListener(VEL);
+        mDatabase_selectedCar.child("data").addValueEventListener(VEL);
     }
 
     ValueEventListener VEL = new ValueEventListener() {
@@ -189,67 +180,63 @@ public class FilterList extends AppCompatActivity {
             //int n = 0;
             ItemList.clear();
 
-            for (DataSnapshot key : dataSnapshot.getChildren()) {
+            for (DataSnapshot key_Y : dataSnapshot.getChildren()) {
+                for (DataSnapshot key_M : key_Y.getChildren()) {
+                    for (DataSnapshot key_D : key_M.getChildren()) {
+                        for (DataSnapshot key_t : key_D.getChildren()) {
 
-                boolean refuel = false;
-                if (DbVal(key,"Tanken")!=null)
-                    refuel = (boolean) DbVal(key,"Tanken");
+                            boolean refuel = false;
+                            if (DbVal(key_t, "refuel") != null)
+                                refuel = (boolean) DbVal(key_t, "refuel");
 
-                //Filter ! Entrys
-                if (Objects.requireNonNull(key.getKey()).contains("!"))
-                    continue;
 
-                if(key.child("Fahrer").getValue()==null)
-                    continue;
+                            if (key_t.child("refuel").getValue() == null)
+                                continue;
 
-                if(!(key.child("Fahrer").getValue().equals(SP_driver.getSelectedItem().toString())
-                        ||
-                        SP_driver.getSelectedItemId()==0))
-                    continue;
+                            if (!(Objects.equals(key_t.child("driver").getValue(), SP_driver.getSelectedItem().toString())
+                                    ||
+                                    SP_driver.getSelectedItemId() == 0))
+                                continue;
 
-                if (/*!Objects.requireNonNull(key.getKey()).contains("!")*//*&&
-                        (Objects.requireNonNull(key.child("Fahrer").getValue())
-                                .equals(SP_driver.getSelectedItem().toString())
-                        ||SP_driver.getSelectedItemId()==0)*/
-                        /*&&*/ (zb_beg.toMillis(false)<=TimeParser(key.getKey()
-                                ,DBdateFormat).toMillis(false)&&zb_end.toMillis(false)>TimeParser(key.getKey()
-                                ,DBdateFormat).toMillis(false))&&
-                        showRefuel(refuel)) {
-                    //Log.d("xx","nr: "+n+ "     refuel_Result:"+showRefuel(refuel));
-                    //n++;
+                            if ((zb_beg.toMillis(false) <= TimeParser(key_t.getKey()
+                                    , DBDateFormat_start).toMillis(false) && zb_end.toMillis(false) > TimeParser(key_t.getKey()
+                                    , DBdateFormat).toMillis(false)) &&
+                                    showRefuel(refuel)) {
 
-                    list_Item item = new list_Item();
+                                list_Item item = new list_Item();
 
-                    Time tS = TimeParser(key.getKey(),DBdateFormat);
+                                Time tS = TimeParser(StartTimeStringParser(key_t),DBDateFormat_start);
 
-                    item.settStart(tS);
+                                item.settStart(tS);
 
-                    if (!refuel) {
-                        item.setStartLoc(DbString(key,"StartOrt"));
-                        item.setEndLoc(DbString(key,"ZielOrt"));
+                                if (!refuel) {
+                                    item.setStartLoc(DbString(key_t, "startLoc"));
+                                    item.setEndLoc(DbString(key_t, "endLoc"));
 
-                        Time tE = TimeParser(""+DbString(key,"EndZeit"),DBdateFormat);
-                        item.settEnd(tE);
+                                    Time tE = TimeParser("" + DbString(key_t, "endTime"), DBdateFormat);
+                                    item.settEnd(tE);
+                                }
+
+                                item.setStart(DbInt(key_t, "startKm"));
+                                item.setEnd(DbInt(key_t, "endKm"));
+
+                                item.setSpeed(DbString(key_t, "speed"));
+                                item.setDrain(DbString(key_t, "drain"));
+
+                                item.setDriverName(DbString(key_t, "driver"));
+
+                                item.setRefuel(refuel);
+
+                                item.setPrice(DbString(key_t, "price"));
+
+                                ItemList.addItem(item);
+
+                            }
+                            listAdapter.notifyDataSetInvalidated();
+                        }
                     }
-
-                    item.setStart(DbInt(key,"Start"));
-                    item.setEnd(DbInt(key,"Ziel"));
-
-                    item.setSpeed(DbString(key,"Geschwindigkeit"));
-                    item.setDrain(DbString(key,"Verbrauch"));
-
-                    item.setDriverName(DbString(key,"Fahrer"));
-
-                    item.setRefuel(refuel);
-
-                    item.setPrice(DbString(key,"Preis"));
-
-                    ItemList.addItem(item);
-
                 }
-                listAdapter.notifyDataSetInvalidated();
             }
-            //listAdapter.notifyDataSetInvalidated();
         }
 
         @Override
