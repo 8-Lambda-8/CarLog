@@ -1,25 +1,23 @@
 package com.a8lambda8.carlog;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
 import android.util.ArraySet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +53,7 @@ public class EntryEditor extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Log.d(MainActivity.TAG, String.valueOf(mDatabase.getPath()));
+                //Log.d(MainActivity.TAG, String.valueOf(mDatabase.getPath()));
 
                 postItem();
 

@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.TabLayout;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +14,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
+
+import androidx.annotation.RequiresApi;
+
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.Objects;
 
