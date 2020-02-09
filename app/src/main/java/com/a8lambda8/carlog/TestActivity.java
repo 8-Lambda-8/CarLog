@@ -2,6 +2,7 @@ package com.a8lambda8.carlog;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,7 @@ import android.view.View;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
@@ -25,6 +27,9 @@ import static com.a8lambda8.carlog.MainActivity.TimeParser;
 import static com.a8lambda8.carlog.MainActivity.mDatabase;
 
 public class TestActivity extends AppCompatActivity {
+
+
+    DatabaseReference mRef;
 
 
 
@@ -45,43 +50,43 @@ public class TestActivity extends AppCompatActivity {
         });
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-
+        mRef = FirebaseDatabase.getInstance().getReference().child("cars/0");
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                for (DataSnapshot key: dataSnapshot.getChildren()) {
+                for (DataSnapshot key : dataSnapshot.getChildren()) {
 
-                    if (!Objects.requireNonNull(key.getKey()).contains("!")){
+                    if (!Objects.requireNonNull(key.getKey()).contains("!")) {
                         //Log.d(TAG,""+key);
                         list_Item item = new list_Item();
 
-                        Time tS = TimeParser(key.getKey(),DBDateFormat);
+                        Time tS = TimeParser(key.getKey(), DBDateFormat);
                         item.settStart(tS);
 
-                        if (DbVal(key,"Tanken") == null) {
-                            item.setStartLoc(DbString(key,"StartOrt"));
-                            item.setEndLoc(DbString(key,"ZielOrt"));
-                            Time tE = TimeParser(""+DbString(key,"EndZeit"),DBDateFormat);
+                        if (DbVal(key, "Tanken") == null) {
+                            item.setStartLoc(DbString(key, "StartOrt"));
+                            item.setEndLoc(DbString(key, "ZielOrt"));
+                            Time tE = TimeParser("" + DbString(key, "EndZeit"), DBDateFormat);
                             item.settEnd(tE);
                         }
 
-                        item.setStart(DbInt(key,"Start"));
-                        item.setEnd(DbInt(key,"Ziel"));
+                        item.setStart(DbInt(key, "Start"));
+                        item.setEnd(DbInt(key, "Ziel"));
 
-                        item.setSpeed(DbString(key,"Geschwindigkeit"));
-                        item.setDrain(DbString(key,"Verbrauch"));
+                        item.setSpeed(DbString(key, "Geschwindigkeit"));
+                        item.setDrain(DbString(key, "Verbrauch"));
 
-                        item.setDriverName(DbString(key,"Fahrer"));
+                        item.setDriverName(DbString(key, "Fahrer"));
 
                         boolean refuel = false;
-                        if (DbVal(key,"Tanken")!=null)
-                            refuel = (boolean) DbVal(key,"Tanken");
+                        if (DbVal(key, "Tanken") != null)
+                            refuel = (boolean) DbVal(key, "Tanken");
 
                         item.setRefuel(refuel);
 
-                        item.setPrice(DbString(key,"Preis"));
+                        item.setPrice(DbString(key, "Preis"));
 
 
                         postItem(item);
@@ -98,15 +103,19 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
 
     private void postItem(list_Item Item){
+
+
 
         //mDatabase.child(originalStartTime.format(DBDateFormat)).setValue(null);
 
         @SuppressLint("DefaultLocale")
         DatabaseReference itemRef =
-                mDatabase.child("!newStructure")
+                mRef.child("data")
                 .child(Item.gettStart().format("Y%y/M%m/D%d/%H:%M:%S"));
 
 

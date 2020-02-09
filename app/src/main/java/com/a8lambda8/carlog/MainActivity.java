@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(analysis_i);
             return true;
         }
-        if (id == R.id.action_testMenu){
+        if (id == R.id.action_testMenu&&currentUser.getUid()=="faCZuGYR27MDEvN65ojT7QSCELk1"){
             Intent analysis_i = new Intent(this, TestActivity.class);
             startActivity(analysis_i);
 
