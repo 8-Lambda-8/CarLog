@@ -289,6 +289,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
+        if(id == R.id.action_carSettings){
+            Intent action_carSettings_i = new Intent(this, CarSettingsActivity.class);
+            startActivity(action_carSettings_i);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
