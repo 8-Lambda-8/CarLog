@@ -26,10 +26,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
 
-import static com.a8lambda8.carlog.MainActivity.DBDateFormat_start;
-import static com.a8lambda8.carlog.MainActivity.StartTimeStringParser;
-import static com.a8lambda8.carlog.MainActivity.TimeParser;
-import static com.a8lambda8.carlog.MainActivity.mDatabase_selectedCar;
+import static com.a8lambda8.carlog.myUtils.DBDateFormat_start;
+import static com.a8lambda8.carlog.myUtils.StartTimeStringParser;
+import static com.a8lambda8.carlog.myUtils.TimeParser;
+import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
 
 public class FilterList extends AppCompatActivity {
 

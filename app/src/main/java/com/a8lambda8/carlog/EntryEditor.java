@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.a8lambda8.carlog.MainActivity.DBDateFormat;
-import static com.a8lambda8.carlog.MainActivity.mDatabase;
+import static com.a8lambda8.carlog.myUtils.DBDateFormat;
+import static com.a8lambda8.carlog.myUtils.mDatabase;
 
 public class EntryEditor extends AppCompatActivity {
 
@@ -114,8 +114,8 @@ public class EntryEditor extends AppCompatActivity {
 
         ET_startLoc.setText(Item.getStartLoc());
         ET_endLoc.setText(Item.getEndLoc());
-        ET_startKm.setText(""+Item.getStart());
-        ET_endKm.setText(""+Item.getEnd());
+        ET_startKm.setText(Item.getStart());
+        ET_endKm.setText(Item.getEnd());
         ET_drain.setText(Item.getDrain());
         ET_speed.setText(Item.getSpeed());
         ET_driver.setText(Item.getDriverName());

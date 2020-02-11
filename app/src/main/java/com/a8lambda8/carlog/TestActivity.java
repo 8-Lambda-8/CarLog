@@ -18,14 +18,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
 
-import static com.a8lambda8.carlog.MainActivity.DBDateFormat;
-import static com.a8lambda8.carlog.MainActivity.DBDateFormat_start;
-import static com.a8lambda8.carlog.MainActivity.DbInt;
-import static com.a8lambda8.carlog.MainActivity.DbString;
-import static com.a8lambda8.carlog.MainActivity.DbVal;
-import static com.a8lambda8.carlog.MainActivity.TimeParser;
-import static com.a8lambda8.carlog.MainActivity.mDatabase;
-import static com.a8lambda8.carlog.MainActivity.mDatabase_selectedCar;
+import static com.a8lambda8.carlog.myUtils.DBDateFormat;
+import static com.a8lambda8.carlog.myUtils.DBDateFormat_start;
+import static com.a8lambda8.carlog.myUtils.DbInt;
+import static com.a8lambda8.carlog.myUtils.DbString;
+import static com.a8lambda8.carlog.myUtils.DbVal;
+import static com.a8lambda8.carlog.myUtils.TimeParser;
+import static com.a8lambda8.carlog.myUtils.mDatabase;
+import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
 
 public class TestActivity extends AppCompatActivity {
 

@@ -62,16 +62,6 @@
                 android:value="com.a8lambda8.carlog.MainActivity" />
         </activity>
 
-        <receiver android:name=".CarConnectionReceiver">
-            <intent-filter>
-                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".onBootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

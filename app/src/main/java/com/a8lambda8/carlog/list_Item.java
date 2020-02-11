@@ -32,7 +32,7 @@ public class list_Item implements Serializable {
 
     list_Item(){
 
-    };
+    }
 
     list_Item(long tStart, long tEnd, String StartLoc, String EndLoc, int start, int end, String speed, String drain, String driverName, Boolean refuel, String price){
         this.tStart = new Time(Time.getCurrentTimezone());
@@ -79,37 +79,37 @@ public class list_Item implements Serializable {
     }
 
 
-    public Time gettStart() {
+    Time gettStart() {
         return tStart;
     }
 
-    public void settStart(Time tStart) {
+    void settStart(Time tStart) {
         this.tStart = tStart;
     }
 
-    public Time gettEnd() {
+    Time gettEnd() {
         return tEnd;
     }
 
-    public void settEnd(Time tEnd) {
+    void settEnd(Time tEnd) {
         this.tEnd = tEnd;
     }
 
 
 
-    public String getEndLoc() {
+    String getEndLoc() {
         return EndLoc;
     }
 
-    public void setEndLoc(String endLoc) {
+    void setEndLoc(String endLoc) {
         EndLoc = endLoc;
     }
 
-    public String getStartLoc() {
+    String getStartLoc() {
         return StartLoc;
     }
 
-    public void setStartLoc(String startLoc) {
+    void setStartLoc(String startLoc) {
         StartLoc = startLoc;
     }
 
@@ -133,48 +133,48 @@ public class list_Item implements Serializable {
 
 
 
-    public String getSpeed() {
+    String getSpeed() {
         return speed;
     }
 
-    public void setSpeed(String speed) {
+    void setSpeed(String speed) {
         this.speed = speed;
     }
 
-    public String getDrain() {
+    String getDrain() {
         return drain;
     }
 
-    public void setDrain(String drain) {
+    void setDrain(String drain) {
         this.drain = drain;
     }
 
 
 
-    public String getDriverName() {
+    String getDriverName() {
         return driverName;
     }
 
-    public void setDriverName(String driverName) {
+    void setDriverName(String driverName) {
         this.driverName = driverName;
     }
 
 
 
 
-    public Boolean getRefuel() {
+    Boolean getRefuel() {
         return refuel;
     }
 
-    public void setRefuel(Boolean refuel) {
+    void setRefuel(Boolean refuel) {
         this.refuel = refuel;
     }
 
-    public String getPrice() {
+    String getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    void setPrice(String price) {
         this.price = price;
     }
 }

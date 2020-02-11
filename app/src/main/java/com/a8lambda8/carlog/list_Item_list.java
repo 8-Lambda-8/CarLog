@@ -7,7 +7,7 @@ import java.util.Vector;
  * Created by Jakob Wasle on 16.09.2017.
  */
 
-public class list_Item_list {
+class list_Item_list {
 
     //private int itemcount = 0;
     private List<list_Item> itemlist;

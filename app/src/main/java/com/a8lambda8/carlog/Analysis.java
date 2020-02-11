@@ -25,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static com.a8lambda8.carlog.MainActivity.mDatabase;
+import static com.a8lambda8.carlog.myUtils.mDatabase;
 
 public class Analysis extends AppCompatActivity {
 
@@ -96,7 +96,7 @@ public class Analysis extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 user.clear();
                 for (DataSnapshot key : dataSnapshot.getChildren()) {
-                    user.add(Integer.parseInt(key.getKey()),""+key.child("Name").getValue());
+                    user.add(Integer.parseInt(Objects.requireNonNull(key.getKey())),""+key.child("Name").getValue());
                 }
 
                 ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(Analysis.this, android.R.layout.simple_spinner_item, user);
@@ -141,7 +141,7 @@ public class Analysis extends AppCompatActivity {
             Heute.setToNow();
 
             for (DataSnapshot key : dataSnapshot.getChildren()) {
-                if (!key.getKey().contains("!")&&
+                if (!Objects.requireNonNull(key.getKey()).contains("!")&&
                         (Objects.requireNonNull(key.child("Fahrer").getValue()).equals(user.get((int) SP_User.getSelectedItemId()))||SP_User.getSelectedItemId()==4) &&
                         key.child("Tanken").getValue()==null) {
                     anz_Fahrten++;

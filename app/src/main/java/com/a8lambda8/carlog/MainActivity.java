@@ -48,6 +48,21 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.a8lambda8.carlog.myUtils.DBDateFormat;
+import static com.a8lambda8.carlog.myUtils.DBDateFormat_start;
+import static com.a8lambda8.carlog.myUtils.DbInt;
+import static com.a8lambda8.carlog.myUtils.DbString;
+import static com.a8lambda8.carlog.myUtils.DbVal;
+import static com.a8lambda8.carlog.myUtils.RC_SIGN_IN;
+import static com.a8lambda8.carlog.myUtils.StartTimeStringParser;
+import static com.a8lambda8.carlog.myUtils.TAG;
+import static com.a8lambda8.carlog.myUtils.TestDevice;
+import static com.a8lambda8.carlog.myUtils.TimeParser;
+import static com.a8lambda8.carlog.myUtils.mDatabase;
+import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
+import static com.a8lambda8.carlog.myUtils.selectedCarId;
+
+
 public class MainActivity extends AppCompatActivity {
 
     Button B_start, B_stop, B_add, B_cls;
@@ -67,19 +82,10 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
 
-    static DatabaseReference mDatabase, mDatabase_selectedCar;
     FirebaseUser currentUser;
-
-    private static final int RC_SIGN_IN = 123;
-    private static int selectedCarId;
-
-    public static final String TAG = "xx";
-
-    static String DBDateFormat,DBDateFormat_start;
 
     String username = "";
 
-    static boolean TestDevice = true;
 
     public List<String> AutoComplete = new ArrayList<>();
     ArrayAdapter<String> autoCompleteAdapter;
@@ -123,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();//.child("old");
 
-        selectedCarId = SP.getInt("selectedCarId",1);
+        selectedCarId = SP.getInt("selectedCarId",2);
 
         mDatabase_selectedCar = mDatabase.child("cars/"+selectedCarId);
 
@@ -263,8 +269,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_testMenu&& currentUser.getUid().equals("faCZuGYR27MDEvN65ojT7QSCELk1")){
-            Intent analysis_i = new Intent(this, TestActivity.class);
-            startActivity(analysis_i);
+            /*Intent analysis_i = new Intent(this, TestActivity.class);
+            startActivity(analysis_i);*/
 
 
             return true;
@@ -928,46 +934,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
-    static Object DbVal(DataSnapshot key,String child){
-        return key.child(child).getValue();
-    }
-
-    static int DbInt(DataSnapshot key,String child){
-        if (DbVal(key,child)!=null)
-            return Integer.valueOf(DbString(key,child));
-        else return 0;
-    }
-
-    static String DbString(DataSnapshot key,String child){
-        if (DbVal(key,child)!=null)
-            return DbVal(key,child).toString();
-        else return  "";
-    }
-
-    static Time TimeParser(String time, String format){
-        Time t = new Time(Time.getCurrentTimezone());
-
-        if(format.equals(DBDateFormat))     //%y-%m-%d_%H-%M-%S
-            t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
-                    Integer.parseInt(time.substring(6,8)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(0,2)));
-        else if (format.equals(DBDateFormat_start))   //Y%y/M%m/D%d/%H-%M-%S
-            t.set(Integer.parseInt(time.substring(18)),Integer.parseInt(time.substring(15,17)),Integer.parseInt(time.substring(12,14)),
-                Integer.parseInt(time.substring(9,11)),Integer.parseInt(time.substring(5,7))-1,2000+Integer.parseInt(time.substring(1,3)));
-        else if(format.charAt(1)=='d')
-            t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
-                    Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(6,8)));
-        return t;
-    }
-
-    static String StartTimeStringParser(DataSnapshot time){
-
-        DatabaseReference d = time.getRef().getParent();
-        DatabaseReference m = Objects.requireNonNull(d).getParent();
-        DatabaseReference y = Objects.requireNonNull(m).getParent();
-
-        return Objects.requireNonNull(y).getKey()+"/"+m.getKey()+"/"+d.getKey()+"/"+time.getKey();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

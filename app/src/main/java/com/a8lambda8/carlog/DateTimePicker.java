@@ -13,11 +13,12 @@ import android.widget.TimePicker;
 
 import static com.a8lambda8.carlog.FilterList.zb_beg;
 import static com.a8lambda8.carlog.FilterList.zb_end;
+import static com.a8lambda8.carlog.myUtils.TimeParser;
 
 /**
  * Created by jwasl on 17.04.2018.
  */
-public class DateTimePicker {
+class DateTimePicker {
     private TextView TV_out;
     private final String dateFormat = "%d.%m.%y  %H:%M";
     private Time startTime;
@@ -68,17 +69,6 @@ public class DateTimePicker {
         },2000+ startTime.year, startTime.month-1, startTime.monthDay);
         DatePicker.setTitle(con.getString(R.string.selectDate));
         DatePicker.show();
-    }
-
-    private Time TimeParser(String time, String format){
-        Time t = new Time(Time.getCurrentTimezone());
-        if(format.charAt(1)=='y')
-            t.set(0,Integer.parseInt(time.substring(13,15)),Integer.parseInt(time.substring(10,12)),
-                    Integer.parseInt(time.substring(6,8)),Integer.parseInt(time.substring(3,5)),Integer.parseInt(time.substring(0,2)));
-        else if(format.charAt(1)=='d')
-            t.set(0,Integer.parseInt(time.substring(13,15)),Integer.parseInt(time.substring(10,12)),
-                    Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5)),Integer.parseInt(time.substring(6,8)));
-        return t;
     }
 
 }
