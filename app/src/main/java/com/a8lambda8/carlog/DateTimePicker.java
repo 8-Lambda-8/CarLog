@@ -11,8 +11,8 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import static com.a8lambda8.carlog.FilterList.zb_beg;
-import static com.a8lambda8.carlog.FilterList.zb_end;
+import static com.a8lambda8.carlog.FilterListActivity.zb_beg;
+import static com.a8lambda8.carlog.FilterListActivity.zb_end;
 import static com.a8lambda8.carlog.myUtils.TimeParser;
 
 /**

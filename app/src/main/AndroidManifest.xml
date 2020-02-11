@@ -3,10 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.a8lambda8.carlog">
 
-    <!--uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /-->
-
     <application
         android:allowBackup="true"
         android:fullBackupContent="true"
@@ -15,6 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".CarSettingsActivity"
+            android:label="@string/title_activity_car_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.a8lambda8.carlog.MainActivity" />
+        </activity>
         <activity
             android:name=".TestActivity"
             android:label="@string/title_activity_test"
@@ -27,11 +31,11 @@
         <activity
             android:name=".EntryEditor"
             android:label="@string/title_activity_entry_editor"
-            android:parentActivityName=".FilterList"
+            android:parentActivityName=".FilterListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.a8lambda8.carlog.FilterList" />
+                android:value="com.a8lambda8.carlog.FilterListActivity" />
         </activity>
         <activity
             android:name=".MainActivity"
@@ -44,7 +48,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Analysis"
+            android:name=".AnalysisActivity"
             android:label="@string/title_activity_analysis"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -53,7 +57,7 @@
                 android:value="com.a8lambda8.carlog.MainActivity" />
         </activity>
         <activity
-            android:name=".FilterList"
+            android:name=".FilterListActivity"
             android:label="@string/title_activity_list"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -61,7 +65,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.a8lambda8.carlog.MainActivity" />
         </activity>
-
     </application>
 
 </manifest>

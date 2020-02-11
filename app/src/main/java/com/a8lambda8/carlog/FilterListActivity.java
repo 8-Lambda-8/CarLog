@@ -31,7 +31,7 @@ import static com.a8lambda8.carlog.myUtils.StartTimeStringParser;
 import static com.a8lambda8.carlog.myUtils.TimeParser;
 import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
 
-public class FilterList extends AppCompatActivity {
+public class FilterListActivity extends AppCompatActivity {
 
     Spinner SP_driver,SP_refuel;
 
@@ -123,7 +123,7 @@ public class FilterList extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent EntryEditor_i = new Intent(FilterList.this, EntryEditor.class);
+                Intent EntryEditor_i = new Intent(FilterListActivity.this, EntryEditor.class);
 
                 /*if (listAdapter.reverse)
                     position = listAdapter.ge*/

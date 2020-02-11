@@ -27,7 +27,7 @@ import java.util.Objects;
 
 import static com.a8lambda8.carlog.myUtils.mDatabase;
 
-public class Analysis extends AppCompatActivity {
+public class AnalysisActivity extends AppCompatActivity {
 
     ArrayList<String> user;
 
@@ -99,7 +99,7 @@ public class Analysis extends AppCompatActivity {
                     user.add(Integer.parseInt(Objects.requireNonNull(key.getKey())),""+key.child("Name").getValue());
                 }
 
-                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(Analysis.this, android.R.layout.simple_spinner_item, user);
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(AnalysisActivity.this, android.R.layout.simple_spinner_item, user);
                 spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 SP_User.setAdapter(spinnerArrayAdapter);
             }
