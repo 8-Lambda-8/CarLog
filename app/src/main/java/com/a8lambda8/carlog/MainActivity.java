@@ -259,20 +259,18 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }*/
         if (id == R.id.action_analysis){
-            Intent analysis_i = new Intent(this, Analysis.class);
+            Intent analysis_i = new Intent(this, AnalysisActivity.class);
             startActivity(analysis_i);
             return true;
         }
         if (id == R.id.action_List){
-            Intent analysis_i = new Intent(this, FilterList.class);
+            Intent analysis_i = new Intent(this, FilterListActivity.class);
             startActivity(analysis_i);
             return true;
         }
         if (id == R.id.action_testMenu&& currentUser.getUid().equals("faCZuGYR27MDEvN65ojT7QSCELk1")){
-            /*Intent analysis_i = new Intent(this, TestActivity.class);
-            startActivity(analysis_i);*/
-
-
+            Intent analysis_i = new Intent(this, TestActivity.class);
+            startActivity(analysis_i);
             return true;
         }
         if(id == R.id.action_logOut){

@@ -28,20 +28,21 @@
         android:title="@string/ListWithFilter"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_carSettings"
+        android:orderInCategory="100"
+        android:title="@string/carSettings"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_testMenu"
         android:orderInCategory="100"
         android:title="@string/testMenu"
-        app:showAsAction="never"
-        />
+        android:visible="false"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_logOut"
         android:orderInCategory="100"
         android:title="@string/logOut"
         app:showAsAction="never"
         />
-    <!--<item
-        android:id="@+id/action_registerBT"
-        android:orderInCategory="100"
-        android:title="register Bluetooth"
-        app:showAsAction="ifRoom" />-->
+
 </menu>

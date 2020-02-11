@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.a8lambda8.carlog.Analysis"
+    tools:context="com.a8lambda8.carlog.AnalysisActivity"
     tools:showIn="@layout/activity_analysis">
 
     <Spinner
