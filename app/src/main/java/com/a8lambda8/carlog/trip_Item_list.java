@@ -7,25 +7,25 @@ import java.util.Vector;
  * Created by Jakob Wasle on 16.09.2017.
  */
 
-class list_Item_list {
+class trip_Item_list {
 
     //private int itemcount = 0;
-    private List<list_Item> itemlist;
+    private List<trip_Item> itemlist;
 
-    list_Item_list () {
+    trip_Item_list() {
         itemlist = new Vector<>();
     }
 
-    void addItem(list_Item item) {
+    void addItem(trip_Item item) {
         itemlist.add(item);
         //itemcount++;
     }
 
-    list_Item getItem(int location) {
+    trip_Item getItem(int location) {
         return itemlist.get(location);
     }
 
-    List<list_Item> getAllItems() {
+    List<trip_Item> getAllItems() {
         return itemlist;
     }
 

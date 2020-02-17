@@ -4,12 +4,16 @@ import android.os.Bundle;
 import android.text.format.Time;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.a8lambda8.carlog.myUtils.DBDateFormat;
 
 /**
  * Created by Jakob Wasle on 15.09.2017.
  */
 
-public class list_Item implements Serializable {
+public class trip_Item implements Serializable {
 
 
     private Time tStart;
@@ -25,16 +29,17 @@ public class list_Item implements Serializable {
     private String drain = null;
 
     private String driverName = null;
+    private String driverId = null;
 
     private Boolean refuel = false;
     private String price = null;
 
 
-    list_Item(){
+    trip_Item(){
 
     }
 
-    list_Item(long tStart, long tEnd, String StartLoc, String EndLoc, int start, int end, String speed, String drain, String driverName, Boolean refuel, String price){
+    trip_Item(long tStart, long tEnd, String StartLoc, String EndLoc, int start, int end, String speed, String drain, String driverName, Boolean refuel, String price){
         this.tStart = new Time(Time.getCurrentTimezone());
         this.tStart.set(tStart);
 
@@ -56,7 +61,7 @@ public class list_Item implements Serializable {
         this.price = price;
     }
 
-    list_Item(Bundle bundle){
+    trip_Item(Bundle bundle){
         tStart = new Time(Time.getCurrentTimezone());
         tStart.set(bundle.getLong("tStart"));
 
@@ -176,5 +181,56 @@ public class list_Item implements Serializable {
 
     void setPrice(String price) {
         this.price = price;
+    }
+
+    Map<String, Object> getMap(){
+        Map<String, Object> map = new HashMap<>();
+
+        if (tStart != null) {
+            map.put("startTime",tStart.format(DBDateFormat));
+        }
+        if (tEnd != null) {
+            map.put("endTime",tEnd.format(DBDateFormat));
+        }
+        if (StartLoc != null) {
+            map.put("startLoc", StartLoc);
+        }
+        if (EndLoc != null) {
+            map.put("endLoc",EndLoc);
+        }
+        if (start != 0) {
+            map.put("startKm",start);
+        }
+        if (end != 0) {
+            map.put("endKm",end);
+        }
+        if (speed != null) {
+            map.put("speed",speed);
+        }
+        if (drain != null) {
+            map.put("drain",drain);
+        }
+        if (driverName != null) {
+            map.put("driver",driverName);
+        }
+        if (refuel != null) {
+            map.put("refuel",refuel);
+        }
+        if (price != null) {
+            map.put("price",price);
+        }
+
+
+
+
+        return map;
+    }
+
+    public String getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
     }
 }
