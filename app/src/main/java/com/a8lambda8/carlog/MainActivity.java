@@ -209,20 +209,22 @@ public class MainActivity extends AppCompatActivity {
 
                     AutoComplete.clear();
                     Set<String> loc = new ArraySet<>();
-                    //loc.addAll((List<String>) Objects.requireNonNull(snapshot.get("locations")));
+                    loc.addAll((List<String>) Objects.requireNonNull(snapshot.get("locations")));
 
                     SPEdit.putStringSet("!locations",loc);
-                    SPEdit.apply();
+
 
                     AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
 
                     updateAutoCompleteAdapter();
 
-                    SPEdit.putString("lastRefuel", (String) snapshot.getData().get("lastRefuel"));
-                    SPEdit.putString("lastKm", (String) snapshot.getData().get("lastKm"));
-                    SPEdit.putString("lastLoc", (String) snapshot.getData().get("lastLoc"));
+                    Map<String, Object> map = (Map<String, Object>) snapshot.getData().get("SP_sync");
 
+                    SPEdit.putString("lastRefuel", (String) map.get("lastRefuel"));
+                    SPEdit.putString("lastKm", (String) map.get("lastKm"));
+                    SPEdit.putString("lastLoc", (String) map.get("lastLoc"));
 
+                    SPEdit.apply();
 
                 } else {
                     Log.d(TAG, source + " data: null");
@@ -1057,7 +1059,6 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
-                //TODO: Refuel add Item
                 Time t = initTime();
                 t.setToNow();
 
