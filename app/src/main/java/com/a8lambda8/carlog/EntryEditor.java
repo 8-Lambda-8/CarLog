@@ -33,7 +33,7 @@ public class EntryEditor extends AppCompatActivity {
     AutoCompleteTextView ET_endLoc;
     TextView TV_start, TV_end, TV_dur;
 
-    list_Item Item;
+    trip_Item Item;
 
     Time originalStartTime;
 
@@ -79,7 +79,7 @@ public class EntryEditor extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         Bundle b = getIntent().getExtras();
-        Item = new list_Item(Objects.requireNonNull(b));
+        Item = new trip_Item(Objects.requireNonNull(b));
 
         duration = new Time(Time.getCurrentTimezone());
         originalStartTime = new Time(Time.getCurrentTimezone());

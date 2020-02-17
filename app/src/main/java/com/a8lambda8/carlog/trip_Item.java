@@ -15,6 +15,7 @@ import static com.a8lambda8.carlog.myUtils.DBDateFormat;
 
 public class trip_Item implements Serializable {
 
+    private String ID;
 
     private Time tStart;
     private Time tEnd;
@@ -232,5 +233,13 @@ public class trip_Item implements Serializable {
 
     public void setDriverId(String driverId) {
         this.driverId = driverId;
+    }
+
+    public String getID() {
+        return ID;
+    }
+
+    public void setID(String ID) {
+        this.ID = ID;
     }
 }

@@ -20,13 +20,13 @@ import java.util.List;
  * Created by Jakob Wasle on 15.09.2017.
  */
 
-public class list_adapter extends ArrayAdapter<list_Item> {
+public class list_adapter extends ArrayAdapter<trip_Item> {
 
-    private List<list_Item> items;
+    private List<trip_Item> items;
     private Context context;
     boolean reverse;
 
-    list_adapter(@NonNull Context context, int resource, List<list_Item> items,boolean reverse) {
+    list_adapter(@NonNull Context context, int resource, List<trip_Item> items, boolean reverse) {
         super(context, resource, items);
 
         this.context = context;
@@ -50,7 +50,7 @@ public class list_adapter extends ArrayAdapter<list_Item> {
             v = inflater.inflate(R.layout.list_item,null);
         }
 
-        list_Item item, itemLst;
+        trip_Item item, itemLst;
         int x = 0;
         if(reverse) {
             int revPos = getCount() - (position + 1);
@@ -181,9 +181,9 @@ public class list_adapter extends ArrayAdapter<list_Item> {
 
 
     @Override
-    public list_Item getItem(int position){
+    public trip_Item getItem(int position){
 
-        list_Item i;
+        trip_Item i;
 
         if(reverse)
             i = items.get(getCount() - (position+1));

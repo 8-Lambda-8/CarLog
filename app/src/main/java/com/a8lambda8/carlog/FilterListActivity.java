@@ -40,7 +40,7 @@ public class FilterListActivity extends AppCompatActivity {
     CheckBox CB_Order;
 
     ListView LV;
-    list_Item_list ItemList;
+    trip_Item_list ItemList;
     list_adapter listAdapter;
 
     static Time zb_beg, zb_end;
@@ -115,7 +115,7 @@ public class FilterListActivity extends AppCompatActivity {
 
         ////List View
         LV = findViewById(R.id.LV_filter);
-        ItemList = new list_Item_list();
+        ItemList = new trip_Item_list();
         listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems(),false);
         LV.setAdapter(listAdapter);
 
@@ -128,7 +128,7 @@ public class FilterListActivity extends AppCompatActivity {
                 /*if (listAdapter.reverse)
                     position = listAdapter.ge*/
 
-                list_Item item = listAdapter.getItem(position);
+                trip_Item item = listAdapter.getItem(position);
 
                 EntryEditor_i.putExtra("tStart",item.gettStart().toMillis(false));
                 EntryEditor_i.putExtra("tEnd",item.gettEnd().toMillis(false));
@@ -203,7 +203,7 @@ public class FilterListActivity extends AppCompatActivity {
                                     , DBdateFormat).toMillis(false)) &&
                                     showRefuel(refuel)) {
 
-                                list_Item item = new list_Item();
+                                trip_Item item = new trip_Item();
 
                                 Time tS = TimeParser(StartTimeStringParser(key_t),DBDateFormat_start);
 
