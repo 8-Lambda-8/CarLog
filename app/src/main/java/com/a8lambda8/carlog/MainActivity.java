@@ -16,14 +16,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -36,31 +39,33 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import static com.a8lambda8.carlog.myUtils.DBDateFormat;
 import static com.a8lambda8.carlog.myUtils.DBDateFormat_start;
-import static com.a8lambda8.carlog.myUtils.DbInt;
-import static com.a8lambda8.carlog.myUtils.DbString;
-import static com.a8lambda8.carlog.myUtils.DbVal;
 import static com.a8lambda8.carlog.myUtils.RC_SIGN_IN;
-import static com.a8lambda8.carlog.myUtils.StartTimeStringParser;
 import static com.a8lambda8.carlog.myUtils.TAG;
 import static com.a8lambda8.carlog.myUtils.TestDevice;
 import static com.a8lambda8.carlog.myUtils.TimeParser;
-import static com.a8lambda8.carlog.myUtils.mDatabase;
-import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
+import static com.a8lambda8.carlog.myUtils.db;
+import static com.a8lambda8.carlog.myUtils.mAuth;
+import static com.a8lambda8.carlog.myUtils.postItem;
 import static com.a8lambda8.carlog.myUtils.selectedCarId;
+
+//import static com.a8lambda8.carlog.myUtils.mDatabase;
+//import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -70,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
     AutoCompleteTextView ET_endLoc;
     TextView TV_start, TV_end, TV_dur;
     ListView LV;
-    list_Item_list ItemList;
+    trip_Item_list ItemList;
     list_adapter listAdapter;
+    Spinner SP_CarSelect;
 
     Boolean started = false;
 
@@ -80,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences SP;
     SharedPreferences.Editor SPEdit;
 
-    FirebaseAuth mAuth;
+
 
     FirebaseUser currentUser;
 
@@ -96,8 +102,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Intent intent = getIntent();
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -127,13 +131,10 @@ public class MainActivity extends AppCompatActivity {
         SPEdit = SP.edit();
         SPEdit.apply();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();//.child("old");
+        //mDatabase = FirebaseDatabase.getInstance().getReference();//.child("old");
+        db = FirebaseFirestore.getInstance();
 
-        selectedCarId = SP.getInt("selectedCarId",2);
-
-        mDatabase_selectedCar = mDatabase.child("cars/"+selectedCarId);
-
-        //Log.d(TAG, "onCreate: "+mDatabase_selectedCar.getPath());
+        //mDatabase_selectedCar = mDatabase.child("cars/"+selectedCarId);
 
         if(currentUser!=null) {
             //Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
             username = Objects.requireNonNull(currentUser.getDisplayName()).split(" ")[0];
         }    //Log.d(TAG, "is test Device:"+ TestDevice);
-        if (TestDevice) mDatabase = mDatabase.child("!Test");
+        //if (TestDevice) mDatabase = mDatabase.child("!Test");
 
         fab();
 
@@ -162,8 +163,7 @@ public class MainActivity extends AppCompatActivity {
         AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
         autoCompleteAdapter.setNotifyOnChange(true);
 
-
-        mDatabase_selectedCar.child("locations").addValueEventListener(new ValueEventListener() {
+        /*mDatabase_selectedCar.child("locations").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 AutoComplete.clear();
@@ -180,9 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
                 updateAutoCompleteAdapter();
 
-                /*Log.d(TAG,"Loaded Locations:\n"+AutoComplete);
+                *//*Log.d(TAG,"Loaded Locations:\n"+AutoComplete);
                 Log.d(TAG,"AutoComplete cnt: "+AutoComplete.size());
-                Log.d(TAG,"Adapter cnt: "+autoCompleteAdapter.getCount());*/
+                Log.d(TAG,"Adapter cnt: "+autoCompleteAdapter.getCount());*//*
 
 
             }
@@ -191,9 +191,49 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
+        });*/
+
+        db.collection("cars").document(selectedCarId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
+                        ? "Local" : "Server";
+
+                if (snapshot != null && snapshot.exists()) {
+                    //Log.d(TAG, source + " data: " + snapshot.getData());
+
+                    AutoComplete.clear();
+                    Set<String> loc = new ArraySet<>();
+                    //loc.addAll((List<String>) Objects.requireNonNull(snapshot.get("locations")));
+
+                    SPEdit.putStringSet("!locations",loc);
+                    SPEdit.apply();
+
+                    AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
+
+                    updateAutoCompleteAdapter();
+
+                    SPEdit.putString("lastRefuel", (String) snapshot.getData().get("lastRefuel"));
+                    SPEdit.putString("lastKm", (String) snapshot.getData().get("lastKm"));
+                    SPEdit.putString("lastLoc", (String) snapshot.getData().get("lastLoc"));
+
+
+
+                } else {
+                    Log.d(TAG, source + " data: null");
+                }
+            }
+
+
         });
 
-        mDatabase_selectedCar.child("SP_Sync").addValueEventListener(new ValueEventListener() {
+
+        /*mDatabase_selectedCar.child("SP_Sync").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 SPEdit.putString("lastRefuel", String.valueOf(dataSnapshot.child("lastRefuel").getValue()));
@@ -205,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
         init();
 
@@ -273,6 +313,26 @@ public class MainActivity extends AppCompatActivity {
             startActivity(analysis_i);
             return true;
         }
+        if (id == R.id.action_test2&& currentUser.getUid().equals("faCZuGYR27MDEvN65ojT7QSCELk1")){
+            db.collection("cars").document("tUumoKgiA77OHX7JUTpY")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
+            return true;
+        }
         if(id == R.id.action_logOut){
             AuthUI.getInstance()
                     .signOut(MainActivity.this)
@@ -320,11 +380,7 @@ public class MainActivity extends AppCompatActivity {
         ET_drain = findViewById(R.id.et_drain);
         ET_speed = findViewById(R.id.et_speed);
 
-
-
         ET_endLoc.setAdapter(autoCompleteAdapter);
-
-
 
         ET_startLoc.setText(SP.getString("StartLoc",""));
         ET_endLoc.setText(SP.getString("EndLoc",""));
@@ -560,13 +616,52 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                DatabaseReference startTimeRef = mDatabase_selectedCar.child("data/"+timeStart.format(DBDateFormat_start));
+
+                trip_Item item = new trip_Item();
+
+                item.settStart(timeStart);
+                item.settEnd(timeEnd);
+
+
+                item.setStartLoc(ET_startLoc.getText().toString());
+                item.setEndLoc(ET_startLoc.getText().toString());
+
+
+                item.setStart(Integer.parseInt(ET_startKm.getText().toString()));
+                item.setEnd(Integer.parseInt(ET_endKm.getText().toString()));
+
+                item.setSpeed(ET_speed.getText().toString());
+                item.setDrain(ET_drain.getText().toString());
+
+                item.setDriverName(username);
+                item.setDriverId(mAuth.getUid());
+
+                /*boolean refuel = false;
+                if (DbVal(key_t,"refuel")!=null)
+                    refuel = (boolean) DbVal(key_t,"refuel");*/
+
+                //item.setRefuel(refuel);
+
+                //item.setPrice(DbString(key_t,"Preis"));
+
+                postItem(item);
 
                 SPEdit.putString("lastKm",ET_endKm.getText().toString());
-                mDatabase_selectedCar.child("SP_Sync").child("lastKm").setValue(ET_endKm.getText().toString());
+                //mDatabase_selectedCar.child("SP_Sync").child("lastKm").setValue(ET_endKm.getText().toString());
                 SPEdit.putString("lastLoc",ET_endLoc.getText().toString());
-                mDatabase_selectedCar.child("SP_Sync").child("lastLoc").setValue(ET_endLoc.getText().toString());
+                //mDatabase_selectedCar.child("SP_Sync").child("lastLoc").setValue(ET_endLoc.getText().toString());
                 SPEdit.apply();
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("lastKm", ET_endKm.getText().toString());
+                map.put("lastLoc", ET_endKm.getText().toString());
+
+                db.collection("cars").document(selectedCarId).update("SP_sync",map);
+
+
+                /*DatabaseReference startTimeRef = mDatabase_selectedCar.child("data/"+timeStart.format(DBDateFormat_start));
+
+
 
                 startTimeRef.child("endTime").setValue(""+timeEnd.format(DBDateFormat));
 
@@ -590,7 +685,7 @@ public class MainActivity extends AppCompatActivity {
                     //autoCompleteAdapter.notify();
 
                     mDatabase_selectedCar.child("locations").setValue(AutoComplete);
-                }
+                }*/
 
                 try {
                         Thread.sleep(50);
@@ -638,10 +733,11 @@ public class MainActivity extends AppCompatActivity {
 
         ////ListView
         LV = findViewById(R.id.fahrten);
-        ItemList = new list_Item_list();
+        ItemList = new trip_Item_list();
         listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems(),true);
         LV.setAdapter(listAdapter);
 
+        //old:
         /*mDatabase.child("old").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -650,7 +746,7 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot key : dataSnapshot.getChildren()) {
                     if (!Objects.requireNonNull(key.getKey()).contains("!")){
                         //Log.d(TAG,""+key);
-                        list_Item item = new list_Item();
+                        trip_Item item = new trip_Item();
 
                         Time tS = TimeParser(key.getKey(),DBDateFormat);
                         item.settStart(tS);
@@ -692,7 +788,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
-        mDatabase_selectedCar.child("data/Y20").addValueEventListener(new ValueEventListener() {
+        //new:
+        /*mDatabase_selectedCar.child("data/Y20").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ItemList.clear();
@@ -705,7 +802,7 @@ public class MainActivity extends AppCompatActivity {
                                 //Log.d(TAG, "onDataChange: "+key_t);
 
                                 //Log.d(TAG,""+key);
-                                list_Item item = new list_Item();
+                                trip_Item item = new trip_Item();
 
                                 Time tS = TimeParser(StartTimeStringParser(key_t),DBDateFormat_start);
                                 item.settStart(tS);
@@ -746,9 +843,105 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
+        Time t = initTime();
+        t.setToNow();
+        t.set(t.toMillis(false)-((long) 1000*60*60*24*30*6));
+
+        db.collection("cars").document(selectedCarId).collection("data")
+                .whereGreaterThan("startTime", t.format(DBDateFormat))
+                //.orderBy("startTime")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                        for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+
+                            trip_Item item = new trip_Item();
+
+                            Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
+                            item.settStart(tS);
+
+                            item.setRefuel((Boolean) doc.get("refuel"));
+
+                            if (!item.getRefuel()) {
+                                item.setStartLoc((String) doc.get("startLoc"));
+                                item.setEndLoc((String) doc.get("endLoc"));
+                                Time tE = TimeParser((String) doc.get("endTime"), DBDateFormat);
+                                item.settEnd(tE);
+                            }
+
+                            Log.d(TAG, "doc get startKm:"+doc.get("startKm"));
+
+                            item.setStart(Math.toIntExact((long)doc.get("startKm")));
+                            item.setEnd(Math.toIntExact((long)doc.get("endKm")));
+
+                            item.setSpeed((String) doc.get("speed"));
+                            item.setDrain((String) doc.get("drain"));
+
+                            item.setDriverName((String) doc.get("driver"));
+
+
+
+                            item.setPrice((String) doc.get("Preis"));
+
+                            ItemList.addItem(item);
+
+                            listAdapter.notifyDataSetInvalidated();
+                        }
+
+                    }
+                });
 
         addable();
+
+        SP_CarSelect = findViewById(R.id.SP_carSelect);
+        SP_CarSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        final List<CarSpinnerItem> cars = new ArrayList<>();
+        /*categories.add("Automobile");
+        categories.add("Business Services");
+        categories.add("Computers");
+        categories.add("Education");
+        categories.add("Personal");
+        categories.add("Travel");*/
+
+        final ArrayAdapter<CarSpinnerItem> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cars);
+
+        SP_CarSelect.setAdapter(dataAdapter);
+
+        /*mDatabase.child("user").child(currentUser.getUid()).child("cars").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "cars of User: "+dataSnapshot.getValue());
+
+                //int[] carIds = dataSnapshot.getValue();
+
+                cars.clear();
+
+                for (DataSnapshot key : dataSnapshot.getChildren()) {
+                    cars.add(new CarSpinnerItem((long)key.getValue(),""));
+                }
+
+                dataAdapter.notifyDataSetInvalidated();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });*/
 
     }
 
@@ -864,8 +1057,11 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
+                //TODO: Refuel add Item
                 Time t = initTime();
                 t.setToNow();
+
+                /*
 
                 mDatabase.child(t.format(DBDateFormat)).child("Tanken").setValue(true);
 
@@ -887,7 +1083,26 @@ public class MainActivity extends AppCompatActivity {
 
                 SPEdit.putString("lastRefuel",endKm.getText().toString());
                 SPEdit.apply();
-                mDatabase.child("!SP_Sync").child("lastRefuel").setValue(endKm.getText().toString());
+                mDatabase.child("!SP_Sync").child("lastRefuel").setValue(endKm.getText().toString());*/
+
+                trip_Item item = new trip_Item();
+
+                item.settStart(t);
+
+                item.setStart(Integer.parseInt(startKm.getText().toString()));
+                item.setEnd(Integer.parseInt(endKm.getText().toString()));
+
+                item.setSpeed(speed.getText().toString());
+                item.setDrain(drain.getText().toString());
+
+                item.setDriverName(username);
+                item.setDriverId(mAuth.getUid());
+
+                item.setRefuel(true);
+
+                item.setPrice(price.getText().toString());
+
+                postItem(item);
 
             }
         });

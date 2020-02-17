@@ -1,9 +1,17 @@
 package com.a8lambda8.carlog;
 
 import android.text.format.Time;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
@@ -12,9 +20,11 @@ class myUtils {
     static String DBDateFormat,DBDateFormat_start;
 
     static DatabaseReference mDatabase, mDatabase_selectedCar;
+    static FirebaseFirestore db;
+    static FirebaseAuth mAuth;
 
     static final int RC_SIGN_IN = 123;
-    static int selectedCarId;
+    static String selectedCarId = "tUumoKgiA77OHX7JUTpY"; // "MNicRziL9DRfawDxS8l5"; //
 
     static final String TAG = "xx";
 
@@ -60,5 +70,23 @@ class myUtils {
         return Objects.requireNonNull(y).getKey()+"/"+m.getKey()+"/"+d.getKey()+"/"+time.getKey();
     }
 
+    static void postItem(trip_Item Item){
+
+        db.collection("cars").document(selectedCarId).collection("data")
+            .add(Item.getMap())
+            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error adding document", e);
+                }
+            });
+
+    }
 
 }
