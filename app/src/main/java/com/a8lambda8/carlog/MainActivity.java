@@ -656,8 +656,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("lastKm", ET_endKm.getText().toString());
-                map.put("lastLoc", ET_endKm.getText().toString());
-
+                map.put("lastLoc", ET_endLoc.getText().toString());
+                map.put("lastRefuel", SP.getString("lastRefuel",""));
                 db.collection("cars").document(selectedCarId).update("SP_sync",map);
 
 
