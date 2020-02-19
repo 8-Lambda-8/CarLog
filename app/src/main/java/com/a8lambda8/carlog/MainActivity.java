@@ -592,11 +592,11 @@ public class MainActivity extends AppCompatActivity {
                 //mDatabase_selectedCar.child("SP_Sync").child("lastLoc").setValue(ET_endLoc.getText().toString());
                 SPEdit.apply();
 
-                Map<String, Object> map = new HashMap<>();
-                map.put("lastKm", ET_endKm.getText().toString());
-                map.put("lastLoc", ET_endLoc.getText().toString());
-                map.put("lastRefuel", SP.getString("lastRefuel",""));
-                db.collection("cars").document(selectedCarId).update("SP_sync",map);
+                currentCarRef.update("SP_sync",
+                        "lastLoc",ET_endLoc.getText().toString(),
+                        "lastKm",ET_endKm.getText().toString());
+
+                currentCarRef.update("locations", FieldValue.arrayUnion(ET_endLoc.getText().toString()));
 
 
                 try {
