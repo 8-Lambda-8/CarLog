@@ -24,7 +24,7 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
 
     private List<trip_Item> items;
     private Context context;
-    boolean reverse;
+    private boolean reverse;
 
     list_adapter(@NonNull Context context, int resource, List<trip_Item> items, boolean reverse) {
         super(context, resource, items);
@@ -40,7 +40,6 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
     }
 
 
-
     @SuppressLint("SetTextI18n")
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent){
@@ -50,24 +49,16 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
             v = inflater.inflate(R.layout.list_item,null);
         }
 
-        trip_Item item, itemLst;
-        int x = 0;
+        trip_Item item;
+
         if(reverse) {
             int revPos = getCount() - (position + 1);
             item = items.get(revPos);
-            /*if(position!=0)
-                x = -1;
-            itemLst = items.get(revPos+x);*/
-            //x = 1;
+
         }
         else {
             item = items.get(position);
-            //itemLst = items.get();
 
-            /*itemLst = items.get(getCount());
-            if(position!=0)
-                //x = -1;
-                itemLst = items.get(getCount() - 1);*/
         }
 
 
@@ -92,7 +83,7 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
                 dateTime.setText(item.gettStart().format("%d.%m.%y  %H:%M"));
             }
 
-            if(!item.getRefuel()){//dur!=null&&item.gettEnd()!=null&&item.gettStart()!=null){
+            if(!item.getRefuel()){
 
                 Time duration =  new Time(Time.getCurrentTimezone());
 
