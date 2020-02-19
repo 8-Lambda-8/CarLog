@@ -79,6 +79,7 @@ public class trip_Item implements Serializable {
         drain = bundle.getString("drain");
 
         driverName = bundle.getString("driverName");
+        driverId = bundle.getString("driverId");
 
         refuel = bundle.getBoolean("refuel");
         price = bundle.getString("price");
@@ -214,15 +215,15 @@ public class trip_Item implements Serializable {
         if (driverName != null) {
             map.put("driver",driverName);
         }
+        if (driverId != null) {
+            map.put("driver",driverId);
+        }
         if (refuel != null) {
             map.put("refuel",refuel);
         }
         if (price != null) {
             map.put("price",price);
         }
-
-
-
 
         return map;
     }
@@ -231,15 +232,15 @@ public class trip_Item implements Serializable {
         return driverId;
     }
 
-    public void setDriverId(String driverId) {
+    void setDriverId(String driverId) {
         this.driverId = driverId;
     }
 
-    public String getID() {
+    String getID() {
         return ID;
     }
 
-    public void setID(String ID) {
+    void setID(String ID) {
         this.ID = ID;
     }
 }
