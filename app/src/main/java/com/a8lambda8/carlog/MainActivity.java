@@ -188,13 +188,15 @@ public class MainActivity extends AppCompatActivity {
 
                     updateAutoCompleteAdapter();
 
-                    Map<String, Object> map = (Map<String, Object>) snapshot.getData().get("SP_sync");
+                    if(snapshot.get("SP_sync")!=null) {
+                        Map<String, Object> map = (Map<String, Object>) snapshot.get("SP_sync");
 
-                    SPEdit.putString("lastRefuel", (String) map.get("lastRefuel"));
-                    SPEdit.putString("lastKm", (String) map.get("lastKm"));
-                    SPEdit.putString("lastLoc", (String) map.get("lastLoc"));
+                        SPEdit.putString("lastRefuel", (String) map.get("lastRefuel"));
+                        SPEdit.putString("lastKm", (String) map.get("lastKm"));
+                        SPEdit.putString("lastLoc", (String) map.get("lastLoc"));
 
-                    SPEdit.apply();
+                        SPEdit.apply();
+                    }
 
                 } else {
                     Log.d(TAG, source + " data: null");
