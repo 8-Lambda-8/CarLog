@@ -41,6 +41,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -48,7 +49,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -60,10 +60,12 @@ import static com.a8lambda8.carlog.myUtils.RC_SIGN_IN;
 import static com.a8lambda8.carlog.myUtils.TAG;
 import static com.a8lambda8.carlog.myUtils.TestDevice;
 import static com.a8lambda8.carlog.myUtils.TimeParser;
+import static com.a8lambda8.carlog.myUtils.currentCarDataRef;
+import static com.a8lambda8.carlog.myUtils.currentCarRef;
 import static com.a8lambda8.carlog.myUtils.db;
 import static com.a8lambda8.carlog.myUtils.mAuth;
 import static com.a8lambda8.carlog.myUtils.postItem;
-import static com.a8lambda8.carlog.myUtils.selectedCarId;
+import static com.a8lambda8.carlog.myUtils.updateCarRefs;
 
 //import static com.a8lambda8.carlog.myUtils.mDatabase;
 //import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
@@ -129,10 +131,8 @@ public class MainActivity extends AppCompatActivity {
         SPEdit = SP.edit();
         SPEdit.apply();
 
-        //mDatabase = FirebaseDatabase.getInstance().getReference();//.child("old");
         db = FirebaseFirestore.getInstance();
-
-        //mDatabase_selectedCar = mDatabase.child("cars/"+selectedCarId);
+        updateCarRefs();
 
         if(currentUser!=null) {
             //Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
         autoCompleteAdapter.setNotifyOnChange(true);
 
-        db.collection("cars").document(selectedCarId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        currentCarRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -175,13 +175,16 @@ public class MainActivity extends AppCompatActivity {
                 if (snapshot != null && snapshot.exists()) {
 
                     AutoComplete.clear();
-                    Set<String> loc = new ArraySet<>();
-                    loc.addAll((Collection<? extends String>) Objects.requireNonNull(snapshot.get("locations")));
 
-                    SPEdit.putStringSet("!locations",loc);
+                    if(snapshot.get("locations")!=null) {
+                        Set<String> loc = new ArraySet<>();
+                        loc.addAll((Collection<? extends String>) snapshot.get("locations"));
 
+                        SPEdit.putStringSet("!locations",loc);
 
-                    AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
+                        AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
+                    }
+
 
                     updateAutoCompleteAdapter();
 
@@ -274,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
+                        if (Objects.requireNonNull(document).exists()) {
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         } else {
                             Log.d(TAG, "No such document");
@@ -587,9 +590,7 @@ public class MainActivity extends AppCompatActivity {
                 postItem(item);
 
                 SPEdit.putString("lastKm",ET_endKm.getText().toString());
-                //mDatabase_selectedCar.child("SP_Sync").child("lastKm").setValue(ET_endKm.getText().toString());
                 SPEdit.putString("lastLoc",ET_endLoc.getText().toString());
-                //mDatabase_selectedCar.child("SP_Sync").child("lastLoc").setValue(ET_endLoc.getText().toString());
                 SPEdit.apply();
 
                 currentCarRef.update("SP_sync",
@@ -653,7 +654,7 @@ public class MainActivity extends AppCompatActivity {
         t.setToNow();
         t.set(t.toMillis(false)-((long) 1000*60*60*24*30*6*5));
 
-        db.collection("cars").document(selectedCarId).collection("data")
+        currentCarDataRef
                 .whereGreaterThan("startTime", t.format(DBDateFormat))
                 //.orderBy("startTime")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -910,14 +911,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case 2:{
                         ET_startKm.setText(String.valueOf(msg.arg2));
-                        //fahrt.setZielKM(msg.arg2);
-                        //ref.child("ZielKM").setValue(msg.arg2);
                         break;
                     }
                     case 3:{
                         ET_endKm.setText(String.valueOf(msg.arg2));
-                        //fahrt.setRückAbholKM(msg.arg2);
-                        //ref.child("RückAbholKM").setValue(msg.arg2);
                         break;
                     }
                 }
