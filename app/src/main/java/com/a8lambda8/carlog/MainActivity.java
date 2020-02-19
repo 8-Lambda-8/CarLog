@@ -626,7 +626,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 item.setStartLoc(ET_startLoc.getText().toString());
-                item.setEndLoc(ET_startLoc.getText().toString());
+                item.setEndLoc(ET_endLoc.getText().toString());
 
 
                 item.setStart(Integer.parseInt(ET_startKm.getText().toString()));
@@ -860,6 +860,8 @@ public class MainActivity extends AppCompatActivity {
                         for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
 
                             trip_Item item = new trip_Item();
+
+                            Log.d(TAG, "id: "+doc.getId());
 
                             Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
                             item.settStart(tS);
