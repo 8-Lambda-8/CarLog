@@ -667,8 +667,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
-                        for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        ItemList.clear();
 
+                        for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                             trip_Item item = new trip_Item();
 
                             item.setID(doc.getId());
