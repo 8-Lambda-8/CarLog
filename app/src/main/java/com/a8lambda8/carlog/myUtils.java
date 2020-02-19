@@ -89,4 +89,9 @@ class myUtils {
 
     }
 
+    static void updateCarRefs(){
+        currentCarRef = db.collection("cars").document(selectedCarId);
+        currentCarDataRef = currentCarRef.collection("data");
+    }
+
 }
