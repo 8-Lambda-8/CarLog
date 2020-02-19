@@ -140,8 +140,7 @@ public class MainActivity extends AppCompatActivity {
             if (currentUser.getEmail() != null && !Objects.equals(currentUser.getEmail(), ""))
                 TestDevice = !("j.wasle111@gmail.com;leow707@gmail.com;??".contains(Objects.requireNonNull(currentUser.getEmail())));
             username = Objects.requireNonNull(currentUser.getDisplayName()).split(" ")[0];
-        }    //Log.d(TAG, "is test Device:"+ TestDevice);
-        //if (TestDevice) mDatabase = mDatabase.child("!Test");
+        }
 
         fab();
 
@@ -155,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         final Set<String> def = new ArraySet<>();
-        def.add("Elbigenalp");
-        def.add("!!Default Values");
 
         AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
         autoCompleteAdapter.setNotifyOnChange(true);
