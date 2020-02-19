@@ -648,6 +648,13 @@ public class MainActivity extends AppCompatActivity {
         ItemList = new trip_Item_list();
         listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems(),true);
         LV.setAdapter(listAdapter);
+        LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                trip_Item x = listAdapter.getItem(position);
+                Log.d(TAG, "debug OnItem Click: "+x.getID()+" "+x.getMap());
+            }
+        });
 
         Time t = initTime();
         t.setToNow();
