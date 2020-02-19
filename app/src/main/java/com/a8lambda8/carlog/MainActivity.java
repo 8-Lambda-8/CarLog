@@ -592,9 +592,9 @@ public class MainActivity extends AppCompatActivity {
                 SPEdit.putString("lastLoc",ET_endLoc.getText().toString());
                 SPEdit.apply();
 
-                currentCarRef.update("SP_sync",
-                        "lastLoc",ET_endLoc.getText().toString(),
-                        "lastKm",ET_endKm.getText().toString());
+                currentCarRef.update(
+                        "SP_sync.lastLoc",ET_endLoc.getText().toString(),
+                        "SP_sync.lastKm",ET_endKm.getText().toString());
 
                 currentCarRef.update("locations", FieldValue.arrayUnion(ET_endLoc.getText().toString()));
 
