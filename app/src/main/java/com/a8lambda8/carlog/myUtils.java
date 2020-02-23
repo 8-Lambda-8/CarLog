@@ -1,5 +1,6 @@
 package com.a8lambda8.carlog;
 
+import android.content.SharedPreferences;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -21,10 +23,15 @@ class myUtils {
 
     static DatabaseReference mDatabase, mDatabase_selectedCar;
     static FirebaseFirestore db;
+    static DocumentReference currentCarRef, currentUserRef;
+    static CollectionReference currentCarDataRef;
     static FirebaseAuth mAuth;
 
+    static SharedPreferences SP;
+    static SharedPreferences.Editor SPEdit;
+
     static final int RC_SIGN_IN = 123;
-    static String selectedCarId = "tUumoKgiA77OHX7JUTpY"; // "MNicRziL9DRfawDxS8l5"; //
+    static String selectedCarId;// =  "tUumoKgiA77OHX7JUTpY"; // "MNicRziL9DRfawDxS8l5"; //
 
     static final String TAG = "xx";
 
@@ -89,9 +96,5 @@ class myUtils {
 
     }
 
-    static void updateCarRefs(){
-        currentCarRef = db.collection("cars").document(selectedCarId);
-        currentCarDataRef = currentCarRef.collection("data");
-    }
 
 }

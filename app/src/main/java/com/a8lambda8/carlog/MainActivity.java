@@ -3,7 +3,6 @@ package com.a8lambda8.carlog;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,6 +43,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -57,15 +57,18 @@ import java.util.Set;
 import static com.a8lambda8.carlog.myUtils.DBDateFormat;
 import static com.a8lambda8.carlog.myUtils.DBDateFormat_start;
 import static com.a8lambda8.carlog.myUtils.RC_SIGN_IN;
+import static com.a8lambda8.carlog.myUtils.SP;
+import static com.a8lambda8.carlog.myUtils.SPEdit;
 import static com.a8lambda8.carlog.myUtils.TAG;
 import static com.a8lambda8.carlog.myUtils.TestDevice;
 import static com.a8lambda8.carlog.myUtils.TimeParser;
 import static com.a8lambda8.carlog.myUtils.currentCarDataRef;
 import static com.a8lambda8.carlog.myUtils.currentCarRef;
+import static com.a8lambda8.carlog.myUtils.currentUserRef;
 import static com.a8lambda8.carlog.myUtils.db;
 import static com.a8lambda8.carlog.myUtils.mAuth;
 import static com.a8lambda8.carlog.myUtils.postItem;
-import static com.a8lambda8.carlog.myUtils.updateCarRefs;
+import static com.a8lambda8.carlog.myUtils.selectedCarId;
 
 //import static com.a8lambda8.carlog.myUtils.mDatabase;
 //import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
@@ -86,10 +89,12 @@ public class MainActivity extends AppCompatActivity {
 
     Time timeStart, timeEnd, duration, currTime;
 
-    SharedPreferences SP;
-    SharedPreferences.Editor SPEdit;
+    List<CarSpinnerItem> carSpinnerItemList;
+    CarSpinner_adapter carSpinner_adapter;
 
     FirebaseUser currentUser;
+    private ListenerRegistration registration_data, registration_2;
+
 
     String username = "";
 
@@ -132,7 +137,9 @@ public class MainActivity extends AppCompatActivity {
         SPEdit.apply();
 
         db = FirebaseFirestore.getInstance();
-        updateCarRefs();
+        currentUserRef = db.collection("user").document(Objects.requireNonNull(mAuth.getUid()));
+        selectedCarId = SP.getString("selectedCarId","x");
+        updateCarRefsAndListener();
 
         if(currentUser!=null) {
             //Log.d(TAG,"Display Name: "+currentUser.getDisplayName());
@@ -158,53 +165,50 @@ public class MainActivity extends AppCompatActivity {
         AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
         autoCompleteAdapter.setNotifyOnChange(true);
 
-        currentCarRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        init();
+
+
+        currentUserRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
+                    Log.w(TAG, "Listen failed. (user)", e);
                     return;
                 }
 
-                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
-                        ? "Local" : "Server";
-
                 if (snapshot != null && snapshot.exists()) {
 
-                    AutoComplete.clear();
+                    List<String> cars = (List<String>) snapshot.get("cars");
 
-                    if(snapshot.get("locations")!=null) {
-                        Set<String> loc = new ArraySet<>();
-                        loc.addAll((Collection<? extends String>) snapshot.get("locations"));
+                    if (cars != null) {
+                        for (String x:cars){
+                            db.collection("cars").document(x).get()
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot document = task.getResult();
+                                                if (Objects.requireNonNull(document).exists()) {
 
-                        SPEdit.putStringSet("!locations",loc);
+                                                    Log.d(TAG, "Add car Name: " + document.get("name"));
+                                                    carSpinnerItemList.add(new CarSpinnerItem(document.getId(), (String) document.get("name")));
 
-                        AutoComplete.addAll(Objects.requireNonNull(Objects.requireNonNull(SP.getStringSet("!locations", def))));
+                                                    carSpinner_adapter.notifyDataSetChanged();
+
+
+                                                } else {
+                                                    Log.d(TAG, "No such document");
+                                                }
+                                            } else {
+                                                Log.d(TAG, "get failed with ", task.getException());
+                                            }
+                                        }
+                                    });
+                        }
                     }
-
-
-                    updateAutoCompleteAdapter();
-
-                    if(snapshot.get("SP_sync")!=null) {
-                        Map<String, Object> map = (Map<String, Object>) snapshot.get("SP_sync");
-
-                        SPEdit.putString("lastRefuel", (String) map.get("lastRefuel"));
-                        SPEdit.putString("lastKm", (String) map.get("lastKm"));
-                        SPEdit.putString("lastLoc", (String) map.get("lastLoc"));
-
-                        SPEdit.apply();
-                    }
-
-                } else {
-                    Log.d(TAG, source + " data: null");
                 }
             }
-
-
         });
-
-        init();
-
 
         started = SP.getBoolean("started",false);
 
@@ -656,60 +660,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Time t = initTime();
-        t.setToNow();
-        t.set(t.toMillis(false)-((long) 1000*60*60*24*30*6*5));
-
-        currentCarDataRef
-                .whereGreaterThan("startTime", t.format(DBDateFormat))
-                //.orderBy("startTime")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-
-                        ItemList.clear();
-
-                        for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                            trip_Item item = new trip_Item();
-
-                            item.setID(doc.getId());
-
-                            Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
-                            item.settStart(tS);
-
-                            item.setRefuel((Boolean) doc.get("refuel"));
-
-                            if (!item.getRefuel()) {
-                                item.setStartLoc((String) doc.get("startLoc"));
-                                item.setEndLoc((String) doc.get("endLoc"));
-                                Time tE = TimeParser((String) doc.get("endTime"), DBDateFormat);
-                                item.settEnd(tE);
-                            }
-
-                            item.setStart(Math.toIntExact((long)doc.get("startKm")));
-                            item.setEnd(Math.toIntExact((long)doc.get("endKm")));
-
-                            item.setSpeed((String) doc.get("speed"));
-                            item.setDrain((String) doc.get("drain"));
-
-                            item.setDriverName((String) doc.get("driver"));
-
-                            item.setPrice((String) doc.get("price"));
-
-                            ItemList.addItem(item);
-
-                            listAdapter.notifyDataSetInvalidated();
-                        }
-
-                    }
-                });
-
         addable();
 
         SP_CarSelect = findViewById(R.id.SP_carSelect);
         SP_CarSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                selectedCarId = carSpinnerItemList.get(position).id;
+                updateCarRefsAndListener();
 
             }
 
@@ -719,34 +678,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final List<CarSpinnerItem> cars = new ArrayList<>();
+        carSpinnerItemList = new ArrayList<>();
+        carSpinner_adapter = new CarSpinner_adapter(this,android.R.layout.simple_spinner_item,carSpinnerItemList);
+        carSpinner_adapter.setNotifyOnChange(true);
 
-        final ArrayAdapter<CarSpinnerItem> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cars);
-
-        SP_CarSelect.setAdapter(dataAdapter);
-
-        /*mDatabase.child("user").child(currentUser.getUid()).child("cars").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d(TAG, "cars of User: "+dataSnapshot.getValue());
-
-                //int[] carIds = dataSnapshot.getValue();
-
-                cars.clear();
-
-                for (DataSnapshot key : dataSnapshot.getChildren()) {
-                    cars.add(new CarSpinnerItem((long)key.getValue(),""));
-                }
-
-                dataAdapter.notifyDataSetInvalidated();
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });*/
+        SP_CarSelect.setAdapter(carSpinner_adapter);
 
     }
 
@@ -956,6 +892,112 @@ public class MainActivity extends AppCompatActivity {
     void updateAutoCompleteAdapter(){
         autoCompleteAdapter.clear();
         autoCompleteAdapter.addAll(AutoComplete);
+    }
+
+    void updateCarRefsAndListener(){
+
+        if (registration_data != null)
+            registration_data.remove();
+        if (registration_2 != null)
+            registration_2.remove();
+
+        currentCarRef = db.collection("cars").document(selectedCarId);
+        currentCarDataRef = currentCarRef.collection("data");
+        SPEdit.putString("selectedCarId",selectedCarId);
+
+        if(!selectedCarId.equals("x")) {
+
+            Time t = initTime();
+            t.setToNow();
+            t.set(t.toMillis(false) - ((long) 1000 * 60 * 60 * 24 * 30 * 6));
+
+            registration_data = currentCarDataRef
+                    .whereGreaterThan("startTime", t.format(DBDateFormat))
+                    //.orderBy("startTime")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                            ItemList.clear();
+
+                            for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                                trip_Item item = new trip_Item();
+
+                                item.setID(doc.getId());
+
+                                Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
+                                item.settStart(tS);
+
+                                item.setRefuel((Boolean) doc.get("refuel"));
+
+                                if (!item.getRefuel()) {
+                                    item.setStartLoc((String) doc.get("startLoc"));
+                                    item.setEndLoc((String) doc.get("endLoc"));
+                                    Time tE = TimeParser((String) doc.get("endTime"), DBDateFormat);
+                                    item.settEnd(tE);
+                                }
+
+                                item.setStart(Math.toIntExact((long) doc.get("startKm")));
+                                item.setEnd(Math.toIntExact((long) doc.get("endKm")));
+
+                                item.setSpeed((String) doc.get("speed"));
+                                item.setDrain((String) doc.get("drain"));
+
+                                item.setDriverName((String) doc.get("driver"));
+
+                                item.setPrice((String) doc.get("price"));
+
+                                ItemList.addItem(item);
+
+                                listAdapter.notifyDataSetInvalidated();
+                            }
+
+                        }
+                    });
+
+            registration_2 = currentCarRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+
+                    String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
+                            ? "Local" : "Server";
+
+                    if (snapshot != null && snapshot.exists()) {
+
+                        AutoComplete.clear();
+
+                        if(snapshot.get("locations")!=null) {
+                            Set<String> loc = new ArraySet<>();
+                            loc.addAll((Collection<? extends String>) snapshot.get("locations"));
+
+                            SPEdit.putStringSet("!locations",loc);
+
+                            AutoComplete.addAll(loc);
+                        }
+
+                        updateAutoCompleteAdapter();
+
+                        if(snapshot.get("SP_sync")!=null) {
+                            Map<String, Object> map = (Map<String, Object>) snapshot.get("SP_sync");
+
+                            SPEdit.putString("lastRefuel", (String) map.get("lastRefuel"));
+                            SPEdit.putString("lastKm", (String) map.get("lastKm"));
+                            SPEdit.putString("lastLoc", (String) map.get("lastLoc"));
+
+                            SPEdit.apply();
+                        }
+
+                    } else {
+                        Log.d(TAG, source + " data: null");
+                    }
+                }
+            });
+        }
+
     }
 
 }
