@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (snapshot != null && snapshot.exists()) {
-
+                    @SuppressWarnings("unchecked")
                     List<String> cars = (List<String>) snapshot.get("cars");
 
                     if (cars != null) {
@@ -194,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
                                                     carSpinnerItemList.add(new CarSpinnerItem(document.getId(), (String) document.get("name")));
 
                                                     carSpinner_adapter.notifyDataSetChanged();
-
 
                                                 } else {
                                                     Log.d(TAG, "No such document");
@@ -642,7 +641,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 trip_Item x = listAdapter.getItem(position);
-                Log.d(TAG, "debug OnItem Click: "+x.getID()+" "+x.getMap());
+                Log.d(TAG, "debug OnItem Click: "+ Objects.requireNonNull(x).getID()+" "+x.getMap());
             }
         });
 
@@ -916,7 +915,7 @@ public class MainActivity extends AppCompatActivity {
 
                             ItemList.clear();
 
-                            for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                            for (DocumentSnapshot doc : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
                                 trip_Item item = new trip_Item();
 
                                 item.setID(doc.getId());
@@ -978,6 +977,7 @@ public class MainActivity extends AppCompatActivity {
                         updateAutoCompleteAdapter();
 
                         if(snapshot.get("SP_sync")!=null) {
+                            @SuppressWarnings("unchecked")
                             Map<String, Object> map = (Map<String, Object>) snapshot.get("SP_sync");
 
                             SPEdit.putString("lastRefuel", (String) map.get("lastRefuel"));
