@@ -273,23 +273,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_test2&& currentUser.getUid().equals("faCZuGYR27MDEvN65ojT7QSCELk1")){
-            db.collection("cars").document("tUumoKgiA77OHX7JUTpY")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (Objects.requireNonNull(document).exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
-                    }
-                }
-            });
+
+            Log.d(TAG, ""+carSpinner_adapter);
+
             return true;
         }
         if(id == R.id.action_logOut){

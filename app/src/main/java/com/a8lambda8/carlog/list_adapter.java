@@ -54,7 +54,6 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
         if(reverse) {
             int revPos = getCount() - (position + 1);
             item = items.get(revPos);
-
         }
         else {
             item = items.get(position);
@@ -134,36 +133,6 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
                     CL.setBackgroundColor(Color.WHITE);
                 }
             }
-
-            /*Boolean eq = item.getStart()==itemLst.getEnd();
-
-            Log.d(TAG,String.format("KM: %d: start=%d last_end=%d   isEqual=%b",
-                    position,
-                    item.getStart(),
-                    item.getEnd(),//items.get(position+x).getEnd(),
-                    eq));
-
-            Log.d(TAG,String.format("lst  : start=%d last_end=%d   isEqual=%b",
-                    //position,
-                    itemLst.getStart(),
-                    itemLst.getEnd(),//items.get(position+x).getEnd(),
-                    eq));
-
-            *//*Log.d(TAG,String.format("KM: %d: start=%d last_end=%d   isEqual=%b    --last",
-                    position+x,
-                    items.get(position+x).getStart(),//item.getStart(),
-                    items.get(position+x).getEnd(),
-                    eq));*//*
-
-            Log.d(TAG," \n");
-
-            if(!eq){
-                startKM.setTextColor(Color.RED);
-            }
-
-            if(item.getStartLoc()!=itemLst.getEndLoc()){
-                start.setTextColor(Color.RED);
-            }*/
 
         }
 

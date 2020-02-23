@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.a8lambda8.carlog.myUtils.DBDateFormat;
+import static com.a8lambda8.carlog.myUtils.TimeParser;
 
 /**
  * Created by Jakob Wasle on 15.09.2017.
@@ -216,7 +217,7 @@ public class trip_Item implements Serializable {
             map.put("driver",driverName);
         }
         if (driverId != null) {
-            map.put("driver",driverId);
+            map.put("driverId",driverId);
         }
         if (refuel != null) {
             map.put("refuel",refuel);
