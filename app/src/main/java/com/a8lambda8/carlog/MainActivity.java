@@ -880,6 +880,16 @@ public class MainActivity extends AppCompatActivity {
         autoCompleteAdapter.addAll(AutoComplete);
     }
 
+    @Override
+    protected void onDestroy() {
+
+        if (registration_data != null)
+            registration_data.remove();
+        if (registration_2 != null)
+            registration_2.remove();
+        super.onDestroy();
+    }
+
     void updateCarRefsAndListener(){
 
         if (registration_data != null)
