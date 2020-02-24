@@ -29,9 +29,9 @@ class trip_Item_list {
         return itemlist;
     }
 
-    /*int getItemCount() {
-        return itemcount;
-    }*/
+    int size() {
+        return itemlist.size();
+    }
 
     void clear(){
         itemlist.clear();

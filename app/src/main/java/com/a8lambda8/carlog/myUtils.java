@@ -62,6 +62,10 @@ class myUtils {
         else if (format.equals(DBDateFormat_start))   //Y%y/M%m/D%d/%H-%M-%S
             t.set(Integer.parseInt(time.substring(18)),Integer.parseInt(time.substring(15,17)),Integer.parseInt(time.substring(12,14)),
                     Integer.parseInt(time.substring(9,11)),Integer.parseInt(time.substring(5,7))-1,2000+Integer.parseInt(time.substring(1,3)));
+        else if(format.equals("%d.%m.%y  %H:%M"))
+            t.set(0, Integer.parseInt(time.substring(13, 15)), Integer.parseInt(time.substring(10, 12)),
+                    Integer.parseInt(time.substring(0, 2)), Integer.parseInt(time.substring(3, 5)), 2000 + Integer.parseInt(time.substring(6, 8)));
+
         else if(format.charAt(1)=='d')
             t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
                     Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(6,8)));

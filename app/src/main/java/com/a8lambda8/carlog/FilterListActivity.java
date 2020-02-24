@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -14,22 +15,27 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-import static com.a8lambda8.carlog.myUtils.DBDateFormat_start;
-import static com.a8lambda8.carlog.myUtils.StartTimeStringParser;
+import static com.a8lambda8.carlog.myUtils.DBDateFormat;
+import static com.a8lambda8.carlog.myUtils.TAG;
 import static com.a8lambda8.carlog.myUtils.TimeParser;
-import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
+import static com.a8lambda8.carlog.myUtils.currentCarDataRef;
 
 public class FilterListActivity extends AppCompatActivity {
 
@@ -43,10 +49,15 @@ public class FilterListActivity extends AppCompatActivity {
     trip_Item_list ItemList;
     list_adapter listAdapter;
 
+    List<Boolean> refuelCompareList;
+
     static Time zb_beg, zb_end;
 
     final String DBdateFormat = "%y-%m-%d_%H-%M-%S";
     final String dateFormat = "%d.%m.%y  %H:%M";
+
+    private ListenerRegistration registration;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +78,15 @@ public class FilterListActivity extends AppCompatActivity {
 
         zb_beg=new Time(Time.getCurrentTimezone());
         zb_end=new Time(Time.getCurrentTimezone());
-        zb_beg.set(1,0,2017);
+        zb_beg.set(1,0,2016);
         zb_end.setToNow();
 
+        refuelCompareList = new ArrayList<>();
+
         init();
+
+        updateListener();
+        Log.d(TAG, "onCreate: ?");
 
     }
 
@@ -82,7 +98,26 @@ public class FilterListActivity extends AppCompatActivity {
         AdapterView.OnItemSelectedListener ISL = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                updateLV();
+
+                switch (position){
+                    case 0:
+                        refuelCompareList.clear();
+                        refuelCompareList.add(false);
+                    break;
+                    case 1:
+                        refuelCompareList.clear();
+                        refuelCompareList.add(true);
+                    break;
+                    case 2:
+                        refuelCompareList.clear();
+                        refuelCompareList.add(true);
+                        refuelCompareList.add(false);
+                    break;
+
+                }
+
+                updateListener();
+
             }
 
             @Override
@@ -90,6 +125,7 @@ public class FilterListActivity extends AppCompatActivity {
 
             }
         };
+
         SP_driver.setOnItemSelectedListener(ISL);
         SP_refuel.setOnItemSelectedListener(ISL);
 
@@ -109,7 +145,9 @@ public class FilterListActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 listAdapter.setReverse(isChecked);
-                updateLV();
+
+                updateListener();
+                Log.d(TAG, "onCheckedChanged: "+ItemList.size());
             }
         });
 
@@ -117,6 +155,7 @@ public class FilterListActivity extends AppCompatActivity {
         LV = findViewById(R.id.LV_filter);
         ItemList = new trip_Item_list();
         listAdapter = new list_adapter(getApplicationContext(),R.id.fahrten, ItemList.getAllItems(),false);
+        listAdapter.setNotifyOnChange(true);
         LV.setAdapter(listAdapter);
 
         LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -125,32 +164,28 @@ public class FilterListActivity extends AppCompatActivity {
 
                 Intent EntryEditor_i = new Intent(FilterListActivity.this, EntryEditor.class);
 
-                /*if (listAdapter.reverse)
-                    position = listAdapter.ge*/
-
                 trip_Item item = listAdapter.getItem(position);
 
-                EntryEditor_i.putExtra("tStart",item.gettStart().toMillis(false));
-                EntryEditor_i.putExtra("tEnd",item.gettEnd().toMillis(false));
+                /*EntryEditor_i.putExtra("tStart", item.gettStart().toMillis(false));
+                EntryEditor_i.putExtra("tEnd", item.gettEnd().toMillis(false));
 
-                EntryEditor_i.putExtra("StartLoc",item.getStartLoc());
-                EntryEditor_i.putExtra("EndLoc",item.getEndLoc());
+                EntryEditor_i.putExtra("StartLoc", item.getStartLoc());
+                EntryEditor_i.putExtra("EndLoc", item.getEndLoc());
 
-                EntryEditor_i.putExtra("start",item.getStart());
-                EntryEditor_i.putExtra("end",item.getEnd());
+                EntryEditor_i.putExtra("start", item.getStart());
+                EntryEditor_i.putExtra("end", item.getEnd());
 
-                EntryEditor_i.putExtra("speed",item.getSpeed());
-                EntryEditor_i.putExtra("drain",item.getDrain());
+                EntryEditor_i.putExtra("speed", item.getSpeed());
+                EntryEditor_i.putExtra("drain", item.getDrain());
 
-                EntryEditor_i.putExtra("driverName",item.getDriverName());
+                EntryEditor_i.putExtra("driverName", item.getDriverName());
 
+                EntryEditor_i.putExtra("refuel", item.getRefuel());
+                EntryEditor_i.putExtra("price", item.getPrice());*/
 
-                EntryEditor_i.putExtra("refuel",item.getRefuel());
-                EntryEditor_i.putExtra("price",item.getPrice());
+                EntryEditor_i.putExtra("id", Objects.requireNonNull(item).getID());
 
-
-
-                startActivity(EntryEditor_i);
+                //startActivity(EntryEditor_i);
 
             }
         });
@@ -164,86 +199,67 @@ public class FilterListActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             TextView tv = findViewById(v.getId());
+            Log.d(TAG, "onClick: "+tv.getText());
 
             new DateTimePicker(tv, tv.getContext(),handler).show();
         }
     };
 
-    void updateLV(){
-        mDatabase_selectedCar.child("data").removeEventListener(VEL);
-        mDatabase_selectedCar.child("data").addValueEventListener(VEL);
-    }
+    void updateListener(){
+        if(registration != null)
+            registration.remove();
 
-    ValueEventListener VEL = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            //int n = 0;
-            ItemList.clear();
+        Log.d(TAG, "zb_beg: " +zb_beg.format(DBdateFormat)+" "+zb_beg.toMillis(false));
+        Log.d(TAG, "zb_end: " +zb_end.format(DBdateFormat)+" "+zb_end.toMillis(false));
 
-            for (DataSnapshot key_Y : dataSnapshot.getChildren()) {
-                for (DataSnapshot key_M : key_Y.getChildren()) {
-                    for (DataSnapshot key_D : key_M.getChildren()) {
-                        for (DataSnapshot key_t : key_D.getChildren()) {
+        registration = currentCarDataRef
+                .whereGreaterThan("startTime",zb_beg.format(DBdateFormat))
+                .whereLessThan("startTime",zb_end.format(DBdateFormat))
+                //.orderBy("startTime", CB_Order.isChecked()? Query.Direction.ASCENDING:Query.Direction.DESCENDING)
+                //.whereIn("refuel",refuelCompareList)
+                //.whereEqualTo("driver",SP_driver.getSelectedItem())
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        ItemList.clear();
+                        listAdapter.notifyDataSetChanged();
 
-                            boolean refuel = false;
-                            if (DbVal(key_t, "refuel") != null)
-                                refuel = (boolean) DbVal(key_t, "refuel");
+                        Log.d(TAG, "documents: "+queryDocumentSnapshots.getDocuments().size());
 
+                        for (DocumentSnapshot doc : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
+                            Log.d(TAG, "data: "+doc.getData());
+                            trip_Item item = new trip_Item();
 
-                            if (key_t.child("refuel").getValue() == null)
-                                continue;
+                            item.setID(doc.getId());
 
-                            if (!(Objects.equals(key_t.child("driver").getValue(), SP_driver.getSelectedItem().toString())
-                                    ||
-                                    SP_driver.getSelectedItemId() == 0))
-                                continue;
+                            Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
+                            item.settStart(tS);
 
-                            if ((zb_beg.toMillis(false) <= TimeParser(key_t.getKey()
-                                    , DBDateFormat_start).toMillis(false) && zb_end.toMillis(false) > TimeParser(key_t.getKey()
-                                    , DBdateFormat).toMillis(false)) &&
-                                    showRefuel(refuel)) {
+                            item.setRefuel((Boolean) doc.get("refuel"));
 
-                                trip_Item item = new trip_Item();
-
-                                Time tS = TimeParser(StartTimeStringParser(key_t),DBDateFormat_start);
-
-                                item.settStart(tS);
-
-                                if (!refuel) {
-                                    item.setStartLoc(DbString(key_t, "startLoc"));
-                                    item.setEndLoc(DbString(key_t, "endLoc"));
-
-                                    Time tE = TimeParser("" + DbString(key_t, "endTime"), DBdateFormat);
-                                    item.settEnd(tE);
-                                }
-
-                                item.setStart(DbInt(key_t, "startKm"));
-                                item.setEnd(DbInt(key_t, "endKm"));
-
-                                item.setSpeed(DbString(key_t, "speed"));
-                                item.setDrain(DbString(key_t, "drain"));
-
-                                item.setDriverName(DbString(key_t, "driver"));
-
-                                item.setRefuel(refuel);
-
-                                item.setPrice(DbString(key_t, "price"));
-
-                                ItemList.addItem(item);
-
+                            if (!item.getRefuel()) {
+                                item.setStartLoc((String) doc.get("startLoc"));
+                                item.setEndLoc((String) doc.get("endLoc"));
+                                Time tE = TimeParser((String) doc.get("endTime"), DBDateFormat);
+                                item.settEnd(tE);
                             }
-                            listAdapter.notifyDataSetInvalidated();
+
+                            item.setStart(Math.toIntExact((long) doc.get("startKm")));
+                            item.setEnd(Math.toIntExact((long) doc.get("endKm")));
+
+                            item.setSpeed((String) doc.get("speed"));
+                            item.setDrain((String) doc.get("drain"));
+
+                            item.setDriverName((String) doc.get("driver"));
+
+                            item.setPrice((String) doc.get("price"));
+
+                            ItemList.addItem(item);
+
                         }
                     }
-                }
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
+                });
+    }
 
     boolean showRefuel(boolean refuel){
         //Log.d("xx","refuel Bool: "+refuel+"   spinner: "+SP_refuel.getSelectedItemId());
@@ -262,22 +278,6 @@ public class FilterListActivity extends AppCompatActivity {
         return true;
     }
 
-    Object DbVal(DataSnapshot key,String child){
-        return key.child(child).getValue();
-    }
-
-    int DbInt(DataSnapshot key,String child){
-        if (DbVal(key,child)!=null)
-            return Integer.valueOf(DbString(key,child));
-        else return 0;
-    }
-
-    String DbString(DataSnapshot key,String child){
-        if (DbVal(key,child)!=null)
-            return DbVal(key,child).toString();
-        else return  "";
-    }
-
     @SuppressLint("HandlerLeak")
     android.os.Handler handler = new Handler(){
 
@@ -287,7 +287,8 @@ public class FilterListActivity extends AppCompatActivity {
             if(msg!=null) {
                 switch (msg.arg1) {
                     case 0: {
-                        updateLV();
+                        Log.d(TAG, "handleMessage: ?");
+                        updateListener();
                     }
                 }
             }

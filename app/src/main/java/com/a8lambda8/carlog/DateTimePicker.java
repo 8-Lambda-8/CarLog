@@ -13,6 +13,7 @@ import android.widget.TimePicker;
 
 import static com.a8lambda8.carlog.FilterListActivity.zb_beg;
 import static com.a8lambda8.carlog.FilterListActivity.zb_end;
+import static com.a8lambda8.carlog.myUtils.TAG;
 import static com.a8lambda8.carlog.myUtils.TimeParser;
 
 /**
@@ -29,6 +30,7 @@ class DateTimePicker {
 
     DateTimePicker(TextView tv, Context c, final Handler mResponseHandler) {
         TV_out = tv;
+        Log.d(TAG, "DateTimePicker: "+tv.getText());
         startTime = TimeParser(tv.getText().toString(),dateFormat);
         con = c;
         this.mResponseHandler = mResponseHandler;
@@ -66,7 +68,7 @@ class DateTimePicker {
 
             }
 
-        },2000+ startTime.year, startTime.month-1, startTime.monthDay);
+        },startTime.year, startTime.month-1, startTime.monthDay);
         DatePicker.setTitle(con.getString(R.string.selectDate));
         DatePicker.show();
     }
