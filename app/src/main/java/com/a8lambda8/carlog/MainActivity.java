@@ -9,7 +9,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.Time;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.Menu;
@@ -46,22 +45,30 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import static com.a8lambda8.carlog.myUtils.DBDateFormat;
-import static com.a8lambda8.carlog.myUtils.DBDateFormat_start;
+import static com.a8lambda8.carlog.myUtils.DateFormat_dmhms;
+import static com.a8lambda8.carlog.myUtils.DateFormat_dmyhm;
 import static com.a8lambda8.carlog.myUtils.RC_SIGN_IN;
 import static com.a8lambda8.carlog.myUtils.SP;
 import static com.a8lambda8.carlog.myUtils.SPEdit;
 import static com.a8lambda8.carlog.myUtils.TAG;
 import static com.a8lambda8.carlog.myUtils.TestDevice;
-import static com.a8lambda8.carlog.myUtils.TimeParser;
+import static com.a8lambda8.carlog.myUtils.TimeFormat_hm;
+import static com.a8lambda8.carlog.myUtils.TimeFormat_hms;
 import static com.a8lambda8.carlog.myUtils.currentCarDataRef;
 import static com.a8lambda8.carlog.myUtils.currentCarRef;
 import static com.a8lambda8.carlog.myUtils.currentUserRef;
@@ -69,9 +76,6 @@ import static com.a8lambda8.carlog.myUtils.db;
 import static com.a8lambda8.carlog.myUtils.mAuth;
 import static com.a8lambda8.carlog.myUtils.postItem;
 import static com.a8lambda8.carlog.myUtils.selectedCarId;
-
-//import static com.a8lambda8.carlog.myUtils.mDatabase;
-//import static com.a8lambda8.carlog.myUtils.mDatabase_selectedCar;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -87,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     Boolean started = false;
 
-    Time timeStart, timeEnd, duration, currTime;
+    GregorianCalendar timeStart, timeEnd, duration, currTime;
 
     List<CarSpinnerItem> carSpinnerItemList;
     CarSpinner_adapter carSpinner_adapter;
@@ -110,8 +114,11 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        DBDateFormat = getString(R.string.db_dateformat);
-        DBDateFormat_start = getString(R.string.db_dateformat_start);
+        DBDateFormat = new SimpleDateFormat(getString(R.string.db_date_format), Locale.GERMAN);
+        DateFormat_dmyhm = new SimpleDateFormat(getString(R.string.date_format_dmyhm),Locale.GERMAN);
+        DateFormat_dmhms = new SimpleDateFormat(getString(R.string.date_format_dmhms),Locale.GERMAN);
+        TimeFormat_hms = new SimpleDateFormat(getString(R.string.time_format_hms),Locale.GERMAN);
+        TimeFormat_hm = new SimpleDateFormat(getString(R.string.time_format_hm),Locale.GERMAN);
 
         currentUser = mAuth.getCurrentUser();
         if(currentUser==null) {
@@ -151,10 +158,10 @@ public class MainActivity extends AppCompatActivity {
 
         fab();
 
-        timeStart = initTime();
-        timeEnd = initTime();
-        duration = initTime();
-        currTime = initTime();
+        timeStart = (GregorianCalendar) GregorianCalendar.getInstance();
+        timeEnd = (GregorianCalendar) GregorianCalendar.getInstance();
+        duration = (GregorianCalendar) GregorianCalendar.getInstance();
+        currTime = (GregorianCalendar) GregorianCalendar.getInstance();
 
         autoCompleteAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, AutoComplete);
@@ -166,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
         autoCompleteAdapter.setNotifyOnChange(true);
 
         init();
-
 
         currentUserRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -211,19 +217,20 @@ public class MainActivity extends AppCompatActivity {
 
         started = SP.getBoolean("started",false);
 
-        timeStart.set(SP.getLong("timeStart",2000));
+        timeStart.setTimeInMillis(SP.getLong("timeStart",2000));
 
-        if(timeStart.toMillis(false)>2000) {
+        if(timeStart.getTimeInMillis()>2000) {
             started = true;
-            TV_start.setText(timeStart.format("Start Zeit: %d.%m.  %H:%M:%S"));
+            TV_start.setText(String.format("Start Zeit: %s", DateFormat_dmhms.format(timeStart.getTime())));
+
         }
 
-        timeEnd.set(SP.getLong("timeEnd",2000));
-        if(timeEnd.toMillis(false)>5000) {
+        timeEnd.setTimeInMillis(SP.getLong("timeEnd",2000));
+        if(timeEnd.getTimeInMillis()>5000) {
             started = false;
-            TV_end.setText(timeEnd.format("End  Zeit: %d.%m.  %H:%M:%S"));
-            duration.set(timeEnd.toMillis(false) - timeStart.toMillis(false)-3600000);
-            TV_dur.setText(duration.format("Dauer:      %H:%M:%S"));
+            TV_end.setText(String.format("End  Zeit:%s", DateFormat_dmhms.format(timeEnd.getTime())));
+            duration.setTimeInMillis(timeEnd.getTimeInMillis() - timeStart.getTimeInMillis()-3600000);
+            TV_dur.setText(String.format("Dauer:      %s", TimeFormat_hms.format(duration.getTime())));
         }
 
         if(started)startDurUpdater();
@@ -493,8 +500,8 @@ public class MainActivity extends AppCompatActivity {
         TV_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(timeStart.toMillis(true)>5000){
-                    new TIME_picker(MainActivity.this,timeStart, Handler,"Start Zeit eingeben:",0);
+                if(timeStart.getTimeInMillis()>5000){
+                    new TIME_picker(MainActivity.this,timeStart.getTime(), Handler,"Start Zeit eingeben:",0);
                 }
             }
         });
@@ -503,8 +510,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(!started&&timeEnd.toMillis(true)>5000){
-                    new TIME_picker(MainActivity.this,timeEnd, Handler,"End Zeit eingeben:",1);
+                if(!started&&timeEnd.getTimeInMillis()>5000){
+                    new TIME_picker(MainActivity.this,timeEnd.getTime(), Handler,"End Zeit eingeben:",1);
                 }
 
             }
@@ -521,10 +528,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                timeStart.setToNow();
-                SPEdit.putLong("timeStart",timeStart.toMillis(true));
+                timeStart.setTime(new Date());
+                SPEdit.putLong("timeStart",timeStart.getTimeInMillis());
                 SPEdit.apply();
-                TV_start.setText(timeStart.format("Start Zeit: %d.%m.  %H:%M:%S"));
+                TV_start.setText(String.format("Start Zeit: %s", DateFormat_dmhms.format(timeStart.getTime())));
 
                 ET_startKm.setText(SP.getString("lastKm",""));
                 ET_startLoc.setText(SP.getString("lastLoc",""));
@@ -536,7 +543,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         Log.d(TAG,"started: " + started);
-        if (started||(timeStart.toMillis(false)>2000)&&!(timeStart.toMillis(false)>2000)){
+        if (started||(timeStart.getTimeInMillis()>2000)&&!(timeStart.getTimeInMillis()>2000)){
             B_start.setEnabled(false);
             B_stop.setEnabled(true);
         }
@@ -545,11 +552,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                timeEnd.setToNow();
-                SPEdit.putLong("timeEnd",timeEnd.toMillis(true));
+                timeEnd.setTime(new Date());
+                SPEdit.putLong("timeEnd",timeEnd.getTimeInMillis());
                 SPEdit.apply();
-                TV_end.setText(timeEnd.format("End  Zeit: %d.%m.  %H:%M:%S"));
+                TV_end.setText(String.format("End  Zeit: %s", DateFormat_dmhms.format(timeEnd.getTime())));
                 started = false;
+                updateDur();
                 addable();
             }
         });
@@ -560,8 +568,8 @@ public class MainActivity extends AppCompatActivity {
 
                 trip_Item item = new trip_Item();
 
-                item.settStart(timeStart);
-                item.settEnd(timeEnd);
+                item.settStart(timeStart.getTime());
+                item.settEnd(timeEnd.getTime());
 
                 item.setStartLoc(ET_startLoc.getText().toString());
                 item.setEndLoc(ET_endLoc.getText().toString());
@@ -671,10 +679,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public Time initTime(){
-        return new Time(Time.getCurrentTimezone());
-    }
-
     private void startDurUpdater(){
 
         started = true;
@@ -686,9 +690,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
 
-                duration.set(currTime.toMillis(false) - timeStart.toMillis(false)-3600000);
+                duration.setTimeInMillis(currTime.getTimeInMillis() - timeStart.getTimeInMillis()-3600000);
 
-                TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));
+                Log.d(TAG, String.format("dur updater: %d - %d = %d", currTime.getTimeInMillis(), timeStart.getTimeInMillis(),currTime.getTimeInMillis() - timeStart.getTimeInMillis()));
+
+                TV_dur.setText(String.format("Dauer:       %s", TimeFormat_hms.format(duration.getTime())));
             }
         };
 
@@ -698,10 +704,10 @@ public class MainActivity extends AppCompatActivity {
                 int last = 0;
                 while (started) {
 
-                    currTime.setToNow();
-                    if (currTime.second != last) {
+                    currTime.setTime(new Date());
+                    if (currTime.get(Calendar.SECOND)!= last) {
                         updater.sendMessage(new Message());
-                        last = currTime.second;
+                        last = currTime.get(Calendar.SECOND);
                     }
                 }
             }
@@ -710,20 +716,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateDur(){
 
-        duration.set(timeEnd.toMillis(false) - timeStart.toMillis(false)-3600000);
+        duration.setTimeInMillis(timeEnd.getTimeInMillis() - timeStart.getTimeInMillis()-3600000);
 
-        TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));
+        TV_dur.setText(String.format("Dauer:       %s", TimeFormat_hms.format(duration.getTime())));
     }
 
     private void clear(){
 
-        timeStart.set(2000);
-        timeEnd.set(2000);
-        duration.set(2000);
-        currTime.set(2000);
+        timeStart.setTimeInMillis(2000);
+        timeEnd.setTimeInMillis(2000);
+        duration.setTimeInMillis(2000);
+        currTime.setTimeInMillis(2000);
 
-        SPEdit.putLong("timeStart",timeStart.toMillis(true));
-        SPEdit.putLong("timeEnd",timeStart.toMillis(true));
+        SPEdit.putLong("timeStart",timeStart.getTimeInMillis());
+        SPEdit.putLong("timeEnd",timeStart.getTimeInMillis());
 
         ET_startLoc.setText("");
         ET_endLoc.setText("");
@@ -732,9 +738,9 @@ public class MainActivity extends AppCompatActivity {
         ET_drain.setText("");
         ET_speed.setText("");
 
-        TV_start.setText(timeStart.format("Start Zeit: 00.00.  00:00:00"));
-        TV_end.setText(timeEnd.format("End  Zeit: 00.00.  00:00:00"));
-        TV_dur.setText(duration.format("Dauer:      00:00:00"));
+        TV_start.setText("Start Zeit: 00.00.  00:00:00");//timeStart.format("Start Zeit: 00.00.  00:00:00"));
+        TV_end.setText("End  Zeit: 00.00.  00:00:00");//timeEnd.format("End  Zeit: 00.00.  00:00:00"));
+        TV_dur.setText("Dauer:      00:00:00");//duration.format("Dauer:      00:00:00"));
 
         B_start.setEnabled(true);
 
@@ -751,8 +757,8 @@ public class MainActivity extends AppCompatActivity {
                 Objects.equals(ET_endKm.getText().toString(), "")||
                 Objects.equals(ET_drain.getText().toString(), "")||
                 Objects.equals(ET_speed.getText().toString(), "")||
-                timeEnd.toMillis(false)<=20000||
-                timeStart.toMillis(false)<=20000
+                timeEnd.getTimeInMillis()<=20000||
+                timeStart.getTimeInMillis()<=20000
                 ){
             B_add.setEnabled(false);
         }else{
@@ -783,12 +789,9 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton("Bestätigen", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
-                Time t = initTime();
-                t.setToNow();
-
                 trip_Item item = new trip_Item();
 
-                item.settStart(t);
+                item.settStart(new Date());
 
                 item.setStart(Integer.parseInt(startKm.getText().toString()));
                 item.setEnd(Integer.parseInt(endKm.getText().toString()));
@@ -826,14 +829,16 @@ public class MainActivity extends AppCompatActivity {
             if(msg!=null){
                 switch (msg.arg1){
                     case 0:{
-                        timeStart.set((Time) msg.obj);
-                        TV_start.setText(((Time) msg.obj).format("Start Zeit: %d.%m.  %H:%M:%S"));
+                        timeStart.setTime(((GregorianCalendar) msg.obj).getTime());
+                        TV_start.setText(String.format("Start Zeit: %s", DateFormat_dmhms.format(((GregorianCalendar) msg.obj).getTime())));
+
+                        ;
                         updateDur();
                         break;
                     }
                     case 1:{
-                        timeEnd.set((Time) msg.obj);
-                        TV_end.setText(((Time) msg.obj).format("End Zeit: %d.%m.  %H:%M:%S"));
+                        timeEnd.setTime(((GregorianCalendar) msg.obj).getTime());
+                        TV_end.setText(String.format("End Zeit: %s", DateFormat_dmhms.format(((GregorianCalendar) msg.obj).getTime())));
                         updateDur();
                         break;
                     }
@@ -902,12 +907,11 @@ public class MainActivity extends AppCompatActivity {
 
         if(!selectedCarId.equals("x")) {
 
-            Time t = initTime();
-            t.setToNow();
-            t.set(t.toMillis(false) - ((long) 1000 * 60 * 60 * 24 * 30 * 6));
+            Date d = new Date();
+            d.setTime(d.getTime()-(long) 1000 * 60 * 60 * 24 * 30 * 6);
 
             registration_data = currentCarDataRef
-                    .whereGreaterThan("startTime", t.format(DBDateFormat))
+                    .whereGreaterThan("startTime", DBDateFormat.format(d))
                     //.orderBy("startTime")
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
@@ -920,16 +924,24 @@ public class MainActivity extends AppCompatActivity {
 
                                 item.setID(doc.getId());
 
-                                Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
-                                item.settStart(tS);
+                                //Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
+                                try {
+                                    item.settStart(DBDateFormat.parse((String) doc.get("startTime")));
+                                } catch (ParseException ex) {
+                                    ex.printStackTrace();
+                                }
 
                                 item.setRefuel((Boolean) doc.get("refuel"));
 
                                 if (!item.getRefuel()) {
                                     item.setStartLoc((String) doc.get("startLoc"));
                                     item.setEndLoc((String) doc.get("endLoc"));
-                                    Time tE = TimeParser((String) doc.get("endTime"), DBDateFormat);
-                                    item.settEnd(tE);
+                                    //Time tE = TimeParser((String) doc.get("endTime"), DBDateFormat);
+                                    try {
+                                        item.settEnd(DBDateFormat.parse((String) doc.get("endTime")));
+                                    } catch (ParseException ex) {
+                                        ex.printStackTrace();
+                                    }
                                 }
 
                                 item.setStart(Math.toIntExact((long) doc.get("startKm")));
@@ -980,7 +992,7 @@ public class MainActivity extends AppCompatActivity {
                             @SuppressWarnings("unchecked")
                             Map<String, Object> map = (Map<String, Object>) snapshot.get("SP_sync");
 
-                            SPEdit.putString("lastRefuel", (String) map.get("lastRefuel"));
+                            SPEdit.putString("lastRefuel", (String) Objects.requireNonNull(map).get("lastRefuel"));
                             SPEdit.putString("lastKm", (String) map.get("lastKm"));
                             SPEdit.putString("lastLoc", (String) map.get("lastLoc"));
 

@@ -36,7 +36,13 @@
         android:id="@+id/action_testMenu"
         android:orderInCategory="100"
         android:title="@string/testMenu"
-        android:visible="false"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_test2"
+        android:orderInCategory="100"
+        android:title="@string/test2"
+        android:visible="true"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_logOut"

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.text.format.Time;
 import android.util.ArraySet;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -24,9 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.a8lambda8.carlog.myUtils.DBDateFormat;
-import static com.a8lambda8.carlog.myUtils.mDatabase;
-
 public class EntryEditor extends AppCompatActivity {
 
     EditText ET_startLoc, ET_startKm, ET_endKm, ET_drain, ET_speed, ET_driver;
@@ -35,9 +31,9 @@ public class EntryEditor extends AppCompatActivity {
 
     trip_Item Item;
 
-    Time originalStartTime;
+    /*Time originalStartTime;
 
-    Time duration;
+    Time duration;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +77,9 @@ public class EntryEditor extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         Item = new trip_Item(Objects.requireNonNull(b));
 
-        duration = new Time(Time.getCurrentTimezone());
+        /*duration = new Time(Time.getCurrentTimezone());
         originalStartTime = new Time(Time.getCurrentTimezone());
-        originalStartTime.set(Item.gettStart().toMillis(false));
+        originalStartTime.set(Item.gettStart().toMillis(false));*/
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -127,7 +123,7 @@ public class EntryEditor extends AppCompatActivity {
         TV_dur = findViewById(R.id.tv_dur2);
 
 
-        TV_start.setOnClickListener(new View.OnClickListener() {
+        /*TV_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(Item.gettStart().toMillis(true)>5000){
@@ -148,7 +144,7 @@ public class EntryEditor extends AppCompatActivity {
         });
 
         TV_start.setText(Item.gettStart().format("Start Zeit: %d.%m.  %H:%M:%S"));
-        TV_end.setText(Item.gettEnd().format("End  Zeit: %d.%m.  %H:%M:%S"));
+        TV_end.setText(Item.gettEnd().format("End  Zeit: %d.%m.  %H:%M:%S"));*/
 
         updateDur();
 
@@ -157,7 +153,7 @@ public class EntryEditor extends AppCompatActivity {
 
     private void postItem(){
 
-        mDatabase.child(originalStartTime.format(DBDateFormat)).setValue(null);
+        /*mDatabase.child(originalStartTime.format(DBDateFormat)).setValue(null);
 
 
 
@@ -172,7 +168,7 @@ public class EntryEditor extends AppCompatActivity {
         mDatabase.child(Item.gettStart().format(DBDateFormat)).child("Geschwindigkeit").setValue(""+ET_speed.getText());
         mDatabase.child(Item.gettStart().format(DBDateFormat)).child("Verbrauch").setValue(""+ET_drain.getText());
 
-        mDatabase.child(Item.gettStart().format(DBDateFormat)).child("Fahrer").setValue(""+ET_driver.getText());
+        mDatabase.child(Item.gettStart().format(DBDateFormat)).child("Fahrer").setValue(""+ET_driver.getText());*/
 
 
     }
@@ -187,14 +183,15 @@ public class EntryEditor extends AppCompatActivity {
             if(msg!=null){
                 switch (msg.arg1){
                     case 0:{
-                        Item.gettStart().set((Time) msg.obj);
-                        TV_start.setText(((Time) msg.obj).format("Start Zeit: %d.%m.  %H:%M:%S"));
+                        /*Item.gettStart().set((Time) msg.obj);
+                        TV_start.setText(((Time) msg.obj).format("Start Zeit: %d.%m.  %H:%M:%S"));*/
                         updateDur();
                         break;
                     }
                     case 1:{
-                        Item.gettEnd().set((Time) msg.obj);
-                        TV_end.setText(((Time) msg.obj).format("End Zeit: %d.%m.  %H:%M:%S"));
+                        /*Item.gettEnd().set((Time) msg.obj);
+                        TV_end.setText(((Time) msg.obj).format("End Zeit: %d.%m.  %H:%M:%S"));*/
+
                         updateDur();
                         break;
                     }/*
@@ -217,9 +214,9 @@ public class EntryEditor extends AppCompatActivity {
 
     private void updateDur(){
 
-        duration.set(Item.gettEnd().toMillis(false) - Item.gettStart().toMillis(false)-3600000);
+        /*duration.set(Item.gettEnd().toMillis(false) - Item.gettStart().toMillis(false)-3600000);
 
-        TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));
+        TV_dur.setText(duration.format("Dauer:       %H:%M:%S"));*/
     }
 
 

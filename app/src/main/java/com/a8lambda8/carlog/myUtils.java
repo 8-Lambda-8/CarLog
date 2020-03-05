@@ -1,7 +1,6 @@
 package com.a8lambda8.carlog;
 
 import android.content.SharedPreferences;
-import android.text.format.Time;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,19 +8,16 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Objects;
+import java.text.SimpleDateFormat;
 
 class myUtils {
 
-    static String DBDateFormat,DBDateFormat_start;
+    static SimpleDateFormat DBDateFormat, DateFormat_dmyhm, DateFormat_dmhms, TimeFormat_hms, TimeFormat_hm;
 
-    static DatabaseReference mDatabase, mDatabase_selectedCar;
     static FirebaseFirestore db;
     static DocumentReference currentCarRef, currentUserRef;
     static CollectionReference currentCarDataRef;
@@ -37,23 +33,23 @@ class myUtils {
 
     static boolean TestDevice = true;
 
-    static Object DbVal(DataSnapshot key, String child){
+    /*static Object DbVal(DataSnapshot key, String child){
         return key.child(child).getValue();
-    }
+    }*/
 
-    static int DbInt(DataSnapshot key,String child){
+    /*static int DbInt(DataSnapshot key,String child){
         if (DbVal(key,child)!=null)
             return Integer.valueOf(DbString(key,child));
         else return 0;
-    }
+    }*/
 
-    static String DbString(DataSnapshot key,String child){
+    /*static String DbString(DataSnapshot key,String child){
         if (DbVal(key,child)!=null)
             return DbVal(key,child).toString();
         else return  "";
-    }
+    }*/
 
-    static Time TimeParser(String time, String format){
+    /*static Time TimeParser(String time, String format){
         Time t = new Time(Time.getCurrentTimezone());
 
         if(format.equals(DBDateFormat))     //%y-%m-%d_%H-%M-%S
@@ -70,16 +66,16 @@ class myUtils {
             t.set(Integer.parseInt(time.substring(15)),Integer.parseInt(time.substring(12,14)),Integer.parseInt(time.substring(9,11)),
                     Integer.parseInt(time.substring(0,2)),Integer.parseInt(time.substring(3,5))-1,2000+Integer.parseInt(time.substring(6,8)));
         return t;
-    }
+    }*/
 
-    static String StartTimeStringParser(DataSnapshot time){
+    /*static String StartTimeStringParser(DataSnapshot time){
 
         DatabaseReference d = time.getRef().getParent();
         DatabaseReference m = Objects.requireNonNull(d).getParent();
         DatabaseReference y = Objects.requireNonNull(m).getParent();
 
         return Objects.requireNonNull(y).getKey()+"/"+m.getKey()+"/"+d.getKey()+"/"+time.getKey();
-    }
+    }*/
 
     static void postItem(trip_Item Item){
 

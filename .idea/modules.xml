@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CarLog.iml" filepath="$PROJECT_DIR$/CarLog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/CarLog-app.iml" filepath="$PROJECT_DIR$/app/CarLog-app.iml" group="CarLog/app" />
+      <module fileurl="file://$PROJECT_DIR$/StudioProjects-CarLog.iml" filepath="$PROJECT_DIR$/StudioProjects-CarLog.iml" group="CarLog" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

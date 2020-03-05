@@ -3,7 +3,6 @@ package com.a8lambda8.carlog;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.util.Date;
 import java.util.List;
+
+import static com.a8lambda8.carlog.myUtils.DateFormat_dmyhm;
+import static com.a8lambda8.carlog.myUtils.TimeFormat_hm;
 
 /**
  * Created by Jakob Wasle on 15.09.2017.
@@ -79,16 +82,16 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
 
 
             if(dateTime!=null&&item.gettStart()!=null){
-                dateTime.setText(item.gettStart().format("%d.%m.%y  %H:%M"));
+                dateTime.setText(DateFormat_dmyhm.format(item.gettStart()));
             }
 
             if(!item.getRefuel()){
 
-                Time duration =  new Time(Time.getCurrentTimezone());
+                Date duration =  new Date();
 
-                duration.set(item.gettEnd().toMillis(false) - item.gettStart().toMillis(false)-3600000);
+                duration.setTime(item.gettEnd().getTime()- item.gettStart().getTime()-3600000);
 
-                dur.setText(duration.format("Dauer:      %H:%M"));
+                dur.setText("Dauer:      "+ TimeFormat_hm.format(duration));
 
             }
 
@@ -133,7 +136,6 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
                     CL.setBackgroundColor(Color.WHITE);
                 }
             }
-
         }
 
         return v;

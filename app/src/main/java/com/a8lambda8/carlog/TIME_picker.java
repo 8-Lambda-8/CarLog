@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.text.format.Time;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +17,9 @@ import androidx.annotation.RequiresApi;
 
 import com.google.android.material.tabs.TabLayout;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 
 /**
@@ -32,13 +33,11 @@ class TIME_picker {
     private TimePicker TP;
     private DatePicker DP;
 
-    TIME_picker(Activity parent, final Time in, final Handler mResponseHandler, String title, final int x){
+    TIME_picker(Activity parent, final Date in, final Handler mResponseHandler, String title, final int HandlerIdentifier){
 
-        final Time out = new Time(Time.getCurrentTimezone());
-        final Time now = new Time(Time.getCurrentTimezone());
-        now.setToNow();
+        final GregorianCalendar out = (GregorianCalendar) GregorianCalendar.getInstance();
 
-        out.set(in.toMillis(false));
+        out.setTime(in);
 
         LayoutInflater inflater = (LayoutInflater) parent.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final AlertDialog.Builder alert = new AlertDialog.Builder(parent);
@@ -83,10 +82,9 @@ class TIME_picker {
             @Override
             public void onClick(View view) {
 
-                out.setToNow();
-                TP.setHour(out.hour);
-                out.setToNow();
-                TP.setMinute(out.minute);
+                out.setTime(new Date());
+                TP.setHour(out.get(Calendar.HOUR));
+                TP.setMinute(out.get(Calendar.MINUTE));
 
             }
         });
@@ -94,13 +92,13 @@ class TIME_picker {
         TP = alertView.findViewById(R.id.timePicker);
 
         TP.setIs24HourView(true);
-        TP.setHour(in.hour);
-        TP.setMinute(in.minute);
+        TP.setHour(out.get(Calendar.HOUR));
+        TP.setMinute(out.get(Calendar.MINUTE));
 
         TP.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                out.set(0,selectedMinute,selectedHour, out.monthDay, out.month, out.year);
+                out.set(0,selectedMinute,selectedHour, out.get(Calendar.DAY_OF_MONTH), out.get(Calendar.MONTH), out.get(Calendar.YEAR));
             }
         });
 
@@ -109,20 +107,20 @@ class TIME_picker {
             public void onClick(DialogInterface dialogInterface, int i) {
 
                 Message msg = new Message();
-                msg.arg1 = x;
+                msg.arg1 = HandlerIdentifier;
                 msg.obj = out;
                 mResponseHandler.sendMessage(msg);
-                Log.i("xxx","OK: "+((Time)msg.obj).format("%H:%M"));
+                //Log.i("xxx","OK: "+((Time)msg.obj).format("%H:%M"));
 
             }
         });
 
         DP = alertView.findViewById(R.id.datePicker);
-        DP.updateDate(in.year,in.month,in.monthDay);
+        DP.updateDate(out.get(Calendar.YEAR),out.get(Calendar.MONTH),out.get(Calendar.DAY_OF_MONTH));
         DP.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                out.set(0,out.minute,out.hour, dayOfMonth, monthOfYear, year);
+                out.set(0,out.get(Calendar.MINUTE),out.get(Calendar.HOUR), dayOfMonth, monthOfYear, year);
             }
         });
 

@@ -66,8 +66,11 @@
     <string name="title_activity_car_log_auto">CarLogAutoActivity</string>
     <string name="km_picker_def" translatable="false">2</string>
 
-    <string name="db_dateformat" translatable="false">%y-%m-%d_%H-%M-%S</string>
-    <string name="db_dateformat_start" translatable="false">Y%y/M%m/D%d/%H-%M-%S</string>
+    <string name="db_date_format" translatable="false">yy-MM-dd_HH-mm-ss</string>
+    <string name="date_format_dmyhm" translatable="false">dd.MM.yy HH:mm</string>
+    <string name="date_format_dmhms" translatable="false">dd.MM HH:mm:ss</string>
+    <string name="time_format_hms" translatable="false">HH:mm:ss</string>
+    <string name="time_format_hm" translatable="false">HH:mm</string>
 
 
     <string name="testMenu" translatable="false">Test</string>

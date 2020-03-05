@@ -1,14 +1,13 @@
 package com.a8lambda8.carlog;
 
 import android.os.Bundle;
-import android.text.format.Time;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.a8lambda8.carlog.myUtils.DBDateFormat;
-import static com.a8lambda8.carlog.myUtils.TimeParser;
 
 /**
  * Created by Jakob Wasle on 15.09.2017.
@@ -18,8 +17,8 @@ public class trip_Item implements Serializable {
 
     private String ID;
 
-    private Time tStart;
-    private Time tEnd;
+    private Date tStart;
+    private Date tEnd;
 
     private String StartLoc = null;
     private String EndLoc = null;
@@ -42,11 +41,11 @@ public class trip_Item implements Serializable {
     }
 
     trip_Item(long tStart, long tEnd, String StartLoc, String EndLoc, int start, int end, String speed, String drain, String driverName, Boolean refuel, String price){
-        this.tStart = new Time(Time.getCurrentTimezone());
-        this.tStart.set(tStart);
+        //this.tStart = new Time(Time.getCurrentTimezone());
+        this.tStart.setTime(tStart);
 
-        this.tEnd = new Time(Time.getCurrentTimezone());
-        this.tEnd.set(tEnd);
+        //this.tEnd = new Time(Time.getCurrentTimezone());
+        this.tEnd.setTime(tEnd);
 
         this.StartLoc = StartLoc;
         this.EndLoc = EndLoc;
@@ -64,11 +63,11 @@ public class trip_Item implements Serializable {
     }
 
     trip_Item(Bundle bundle){
-        tStart = new Time(Time.getCurrentTimezone());
-        tStart.set(bundle.getLong("tStart"));
+        //tStart = new Time(Time.getCurrentTimezone());
+        tStart.setTime(bundle.getLong("tStart"));
 
-        tEnd = new Time(Time.getCurrentTimezone());
-        tEnd.set(bundle.getLong("tEnd"));
+        //tEnd = new Time(Time.getCurrentTimezone());
+        tEnd.setTime(bundle.getLong("tEnd"));
 
         StartLoc = bundle.getString("StartLoc");
         EndLoc = bundle.getString("EndLoc");
@@ -86,20 +85,44 @@ public class trip_Item implements Serializable {
         price = bundle.getString("price");
     }
 
+    trip_Item(HashMap map){
+        //tStart = new Time(Time.getCurrentTimezone());
 
-    Time gettStart() {
+        tStart.setTime((Long) map.get("tStart"));
+
+
+        //tEnd = new Time(Time.getCurrentTimezone());
+        tEnd.setTime((long) map.get("tEnd"));
+
+        StartLoc = (String) map.get("StartLoc");
+        EndLoc = (String) map.get("EndLoc");
+
+        start = (Integer) map.get("start");
+        end = (Integer) map.get("end");
+
+        speed = (String) map.get("speed");
+        drain = (String) map.get("drain");
+
+        driverName = (String) map.get("driverName");
+        driverId = (String) map.get("driverId");
+
+        refuel = (boolean) map.get("refuel");
+        price = (String) map.get("price");
+    }
+
+    Date gettStart() {
         return tStart;
     }
 
-    void settStart(Time tStart) {
+    void settStart(Date tStart) {
         this.tStart = tStart;
     }
 
-    Time gettEnd() {
+    Date gettEnd() {
         return tEnd;
     }
 
-    void settEnd(Time tEnd) {
+    void settEnd(Date tEnd) {
         this.tEnd = tEnd;
     }
 
@@ -190,10 +213,10 @@ public class trip_Item implements Serializable {
         Map<String, Object> map = new HashMap<>();
 
         if (tStart != null) {
-            map.put("startTime",tStart.format(DBDateFormat));
+            map.put("startTime",DBDateFormat.format(tStart));
         }
         if (tEnd != null) {
-            map.put("endTime",tEnd.format(DBDateFormat));
+            map.put("endTime",DBDateFormat.format(tEnd));
         }
         if (StartLoc != null) {
             map.put("startLoc", StartLoc);

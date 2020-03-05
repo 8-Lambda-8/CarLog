@@ -8,7 +8,6 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -19,13 +18,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
-
-import static com.a8lambda8.carlog.myUtils.mDatabase;
 
 public class AnalysisActivity extends AppCompatActivity {
 
@@ -89,7 +85,7 @@ public class AnalysisActivity extends AppCompatActivity {
         });
 
         //get Users for spinner
-        DatabaseReference userRef = mDatabase.child("!user");
+        /*DatabaseReference userRef = mDatabase.child("!user");
         user = new ArrayList<>();
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -108,9 +104,9 @@ public class AnalysisActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-        Log.i("xx",SP.getString("Fahrer","Kein Fahrer")+"="+user.lastIndexOf(SP.getString("Fahrer","Kein Fahrer")));
-        SP_User.setSelection(user.lastIndexOf(SP.getString("Fahrer","Kein Fahrer")));
+        });*/
+        //Log.i("xx",SP.getString("Fahrer","Kein Fahrer")+"="+user.lastIndexOf(SP.getString("Fahrer","Kein Fahrer")));
+        //SP_User.setSelection(user.lastIndexOf(SP.getString("Fahrer","Kein Fahrer")));
 
 
         ////TextViews
@@ -124,7 +120,7 @@ public class AnalysisActivity extends AppCompatActivity {
 
 
     void analyse(){
-        mDatabase.addValueEventListener(analyseListener);
+        //mDatabase.addValueEventListener(analyseListener);
     }
 
     ValueEventListener analyseListener = new ValueEventListener() {

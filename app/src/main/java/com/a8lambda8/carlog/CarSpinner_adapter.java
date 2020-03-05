@@ -15,7 +15,7 @@ import java.util.Objects;
 
 public class CarSpinner_adapter extends ArrayAdapter<CarSpinnerItem> {
 
-    List<CarSpinnerItem> items;
+    private List<CarSpinnerItem> items;
     private Context context;
     private int resource;
 
