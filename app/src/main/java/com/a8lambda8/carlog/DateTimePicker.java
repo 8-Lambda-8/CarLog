@@ -68,7 +68,7 @@ class DateTimePicker {
                             zb_beg.setTime(newTime.getTimeInMillis());
                         else if (TV_out.getId()==R.id.tv_zb_end)
                             zb_end.setTime(newTime.getTimeInMillis());
-                        TV_out.setText(DateFormat_dmyhm.format(newTime));
+                        TV_out.setText(DateFormat_dmyhm.format(newTime.getTime()));
 
                         Message msg = new Message();
                         msg.arg1 = 0;
