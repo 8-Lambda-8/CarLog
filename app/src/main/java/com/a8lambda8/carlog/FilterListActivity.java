@@ -107,7 +107,6 @@ public class FilterListActivity extends AppCompatActivity {
         init();
 
         updateListener();
-        Log.d(TAG, "onCreate: ?");
 
     }
 
@@ -248,53 +247,54 @@ public class FilterListActivity extends AppCompatActivity {
                         ItemList.clear();
                         listAdapter.notifyDataSetChanged();
 
-                        Log.d(TAG, "documents: "+ Objects.requireNonNull(queryDocumentSnapshots).getDocuments().size());
+                        if(queryDocumentSnapshots!=null) {
 
-                        for (DocumentSnapshot doc : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
-                            Log.d(TAG, doc.getId()+" data: "+doc.getData());
-                            trip_Item item = new trip_Item();
+                            for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                                //Log.d(TAG, doc.getId()+" data: "+doc.getData());
+                                trip_Item item = new trip_Item();
 
-                            item.setID(doc.getId());
+                                item.setID(doc.getId());
 
-                            //Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
-                            try {
-                                item.settStart(DBDateFormat.parse((String) Objects.requireNonNull(doc.get("startTime"))));
-                            } catch (ParseException ex) {
-                                ex.printStackTrace();
-                            }
-
-                            item.setRefuel((Boolean) doc.get("refuel"));
-
-                            if (!item.getRefuel()) {
-                                item.setStartLoc((String) doc.get("startLoc"));
-                                item.setEndLoc((String) doc.get("endLoc"));
-
+                                //Time tS = TimeParser((String) doc.get("startTime"), DBDateFormat);
                                 try {
-                                    item.settEnd(DBDateFormat.parse((String) Objects.requireNonNull(doc.get("endTime"))));
+                                    item.settStart(DBDateFormat.parse((String) Objects.requireNonNull(doc.get("startTime"))));
                                 } catch (ParseException ex) {
                                     ex.printStackTrace();
                                 }
+
+                                item.setRefuel((Boolean) doc.get("refuel"));
+
+                                if (!item.getRefuel()) {
+                                    item.setStartLoc((String) doc.get("startLoc"));
+                                    item.setEndLoc((String) doc.get("endLoc"));
+
+                                    try {
+                                        item.settEnd(DBDateFormat.parse((String) Objects.requireNonNull(doc.get("endTime"))));
+                                    } catch (ParseException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+
+                                if(doc.get("startKm")!=null)
+                                    item.setStart(Math.toIntExact((long) doc.get("startKm")));
+                                else
+                                    item.setStart(0);
+                                if(doc.get("endKm")!=null)
+                                    item.setEnd(Math.toIntExact((long) doc.get("endKm")));
+                                else{
+                                    item.setEnd(0);
+                                }
+
+                                item.setSpeed((String) doc.get("speed"));
+                                item.setDrain((String) doc.get("drain"));
+
+                                item.setDriverName((String) doc.get("driver"));
+
+                                item.setPrice((String) doc.get("price"));
+
+                                ItemList.addItem(item);
+
                             }
-
-                            if(doc.get("startKm")!=null)
-                                item.setStart(Math.toIntExact((long) doc.get("startKm")));
-                            else
-                                item.setStart(0);
-                            if(doc.get("endKm")!=null)
-                                item.setEnd(Math.toIntExact((long) doc.get("endKm")));
-                            else{
-                                item.setEnd(0);
-                            }
-
-                            item.setSpeed((String) doc.get("speed"));
-                            item.setDrain((String) doc.get("drain"));
-
-                            item.setDriverName((String) doc.get("driver"));
-
-                            item.setPrice((String) doc.get("price"));
-
-                            ItemList.addItem(item);
-
                         }
                     }
                 });
