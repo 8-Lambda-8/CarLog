@@ -246,7 +246,7 @@ public class FilterListActivity extends AppCompatActivity {
                         Log.d(TAG, "documents: "+ Objects.requireNonNull(queryDocumentSnapshots).getDocuments().size());
 
                         for (DocumentSnapshot doc : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
-                            Log.d(TAG, "data: "+doc.getData());
+                            Log.d(TAG, doc.getId()+" data: "+doc.getData());
                             trip_Item item = new trip_Item();
 
                             item.setID(doc.getId());
