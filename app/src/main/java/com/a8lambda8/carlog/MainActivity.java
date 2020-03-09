@@ -650,6 +650,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 trip_Item x = listAdapter.getItem(position);
                 Log.d(TAG, "debug OnItem Click: "+ Objects.requireNonNull(x).getID()+" "+x.getMap());
+                Log.d(TAG, String.format("LINK to firestore: https://console.firebase.google.com/u/0/project/carlog-14eed/database/firestore/data~2Fcars~2F%s~2Fdata~2F%s",
+                        selectedCarId,x.getID()));
             }
         });
 
