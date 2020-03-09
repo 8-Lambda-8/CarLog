@@ -159,7 +159,7 @@
         app:layout_constraintEnd_toEndOf="@+id/distance" />
 
     <TextView
-        android:id="@+id/textView16"
+        android:id="@+id/arrow"
         android:layout_width="14dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

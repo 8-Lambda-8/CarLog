@@ -76,6 +76,8 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
             TextView speed = v.findViewById(R.id.speed);
             TextView distance = v.findViewById(R.id.distance);
 
+            TextView arrow = v.findViewById(R.id.arrow);
+
             TextView driver = v.findViewById(R.id.driver);
             ImageView IVrefuel = v.findViewById(R.id.refuel);
             ConstraintLayout CL = v.findViewById(R.id.layout);
@@ -92,11 +94,10 @@ public class list_adapter extends ArrayAdapter<trip_Item> {
                 duration.setTime(item.gettEnd().getTime()- item.gettStart().getTime()-3600000);
 
                 dur.setText("Dauer:      "+ TimeFormat_hm.format(duration));
-
-            }
-
-            if(item.getRefuel()) {
+                arrow.setText("▲");
+            }else{
                 dur.setText("Kosten: "+item.getPrice()+" €");
+                arrow.setText("");
             }
 
             if(start!=null){
