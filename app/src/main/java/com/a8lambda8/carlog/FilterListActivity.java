@@ -101,6 +101,8 @@ public class FilterListActivity extends AppCompatActivity {
         });
 
         refuelCompareList = new ArrayList<>();
+        refuelCompareList.add(true);
+        refuelCompareList.add(false);
 
         init();
 
@@ -114,39 +116,40 @@ public class FilterListActivity extends AppCompatActivity {
         ////Spinner
         SP_driver = findViewById(R.id.sp_driver);
         SP_refuel = findViewById(R.id.sp_refuel);
-        AdapterView.OnItemSelectedListener ISL = new AdapterView.OnItemSelectedListener() {
+        //AdapterView.OnItemSelectedListener ISL = ;
+
+        //SP_driver.setOnItemSelectedListener(ISL);
+        SP_refuel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                Log.d(TAG, "onItemSelected: "+position);
 
                 switch (position){
                     case 0:
                         refuelCompareList.clear();
                         refuelCompareList.add(false);
-                    break;
+                        break;
                     case 1:
                         refuelCompareList.clear();
                         refuelCompareList.add(true);
-                    break;
+                        break;
                     case 2:
                         refuelCompareList.clear();
                         refuelCompareList.add(true);
                         refuelCompareList.add(false);
-                    break;
+                        break;
 
                 }
-
                 updateListener();
-
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
-        };
-
-        SP_driver.setOnItemSelectedListener(ISL);
-        SP_refuel.setOnItemSelectedListener(ISL);
+        });
+        SP_refuel.setSelection(2);
 
         ////TextViews
         TV_ZB_Beg = findViewById(R.id.tv_zb_beg);
@@ -231,11 +234,13 @@ public class FilterListActivity extends AppCompatActivity {
         Log.d(TAG, "zb_beg: " + DBDateFormat.format(zb_beg));
         Log.d(TAG, "zb_end: " + DBDateFormat.format(zb_end));
 
+        Log.d(TAG, "refuelCompareList "+refuelCompareList);
+
         registration = currentCarDataRef
                 .whereGreaterThanOrEqualTo("startTime",DBDateFormat.format(zb_beg))
                 .whereLessThanOrEqualTo("startTime",DBDateFormat.format(zb_end))
                 //.orderBy("startTime", CB_Order.isChecked()? Query.Direction.ASCENDING:Query.Direction.DESCENDING)
-                //.whereIn("refuel",refuelCompareList)
+                .whereIn("refuel",refuelCompareList)
                 //.whereEqualTo("driver",SP_driver.getSelectedItem())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -293,23 +298,6 @@ public class FilterListActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    boolean showRefuel(boolean refuel){
-        //Log.d("xx","refuel Bool: "+refuel+"   spinner: "+SP_refuel.getSelectedItemId());
-
-        switch ((int) SP_refuel.getSelectedItemId()){
-            case 0:{
-                return !refuel;
-            }
-            case 1:{
-                return refuel;
-            }
-            case 2:{
-                return true;
-            }
-        }
-        return true;
     }
 
     @SuppressLint("HandlerLeak")
