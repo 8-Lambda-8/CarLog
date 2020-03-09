@@ -160,13 +160,10 @@
 
     <TextView
         android:id="@+id/textView16"
-        android:layout_width="wrap_content"
+        android:layout_width="14dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
         android:text="▲"
-        app:layout_constraintBottom_toTopOf="@+id/start"
-        app:layout_constraintEnd_toEndOf="@+id/end"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/end" />
 
