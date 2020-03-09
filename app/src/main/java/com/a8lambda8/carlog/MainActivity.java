@@ -809,6 +809,10 @@ public class MainActivity extends AppCompatActivity {
                 item.setPrice(price.getText().toString());
 
                 postItem(item);
+                SPEdit.putString("lastRefuel",startKm.getText().toString());
+                SPEdit.apply();
+                currentCarRef.update(
+                        "SP_sync.lastRefuel",startKm.getText().toString());
 
             }
         });
