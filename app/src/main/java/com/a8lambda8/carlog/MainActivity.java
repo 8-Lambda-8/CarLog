@@ -950,8 +950,15 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                item.setStart(Math.toIntExact((long) doc.get("startKm")));
-                                item.setEnd(Math.toIntExact((long) doc.get("endKm")));
+                                if(doc.get("startKm")!=null)
+                                    item.setStart(Math.toIntExact((long) doc.get("startKm")));
+                                else
+                                    item.setStart(0);
+                                if(doc.get("endKm")!=null)
+                                    item.setEnd(Math.toIntExact((long) doc.get("endKm")));
+                                else{
+                                    item.setEnd(0);
+                                }
 
                                 item.setSpeed((String) doc.get("speed"));
                                 item.setDrain((String) doc.get("drain"));
