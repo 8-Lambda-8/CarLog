@@ -296,6 +296,25 @@ public class MainActivity extends AppCompatActivity {
                                 Log.e(TAG, Objects.requireNonNull(e.getMessage()));
                             }
 
+                            currentUser = mAuth.getCurrentUser();
+                            if(currentUser==null) {
+
+                                //List<AuthUI.IdpConfig> providers = Arrays.asList(
+                                @SuppressLint("WrongConstant") List<AuthUI.IdpConfig> providers = Collections.singletonList(
+                                        //new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                                        //new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
+                                        new AuthUI.IdpConfig.GoogleBuilder().build());
+
+                                // Create and launch sign-in intent
+                                startActivityForResult(
+                                        AuthUI.getInstance()
+                                                .createSignInIntentBuilder()
+                                                .setAvailableProviders(providers)
+                                                .build(),
+                                        RC_SIGN_IN);
+
+                            }
+
                             /*System.exit(1);*/
                         }
                     });
@@ -838,7 +857,6 @@ public class MainActivity extends AppCompatActivity {
                         timeStart.setTime(((GregorianCalendar) msg.obj).getTime());
                         TV_start.setText(String.format("Start Zeit: %s", DateFormat_dmhms.format(((GregorianCalendar) msg.obj).getTime())));
 
-                        ;
                         updateDur();
                         break;
                     }
@@ -872,7 +890,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Log.d(TAG,""+user);
+                //Log.d(TAG,""+user);
 
                 Intent intent = getIntent();
                 finish();
