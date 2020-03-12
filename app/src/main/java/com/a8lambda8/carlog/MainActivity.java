@@ -217,6 +217,11 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                         }
+                    }else{
+
+                        carSpinnerItemList.add(new CarSpinnerItem("x", "Create new Car"));
+                        carSpinner_adapter.notifyDataSetChanged();
+                        SP_CarSelect.setSelection(0);
                     }
                 }
             }
@@ -688,8 +693,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                selectedCarId = carSpinnerItemList.get(position).id;
-                updateCarRefsAndListener();
+                if(carSpinnerItemList.get(position).id.equals("x")){
+                    Log.d(TAG, "Create New Car");
+                    Intent newCar_i = new Intent(getBaseContext(), NewCarActivity.class);
+                    startActivity(newCar_i);
+                }else {
+                    selectedCarId = carSpinnerItemList.get(position).id;
+                    updateCarRefsAndListener();
+                }
 
             }
 
