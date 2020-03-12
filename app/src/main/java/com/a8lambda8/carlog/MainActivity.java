@@ -186,8 +186,12 @@ public class MainActivity extends AppCompatActivity {
                     @SuppressWarnings("unchecked")
                     List<String> cars = (List<String>) snapshot.get("cars");
 
-                    if (cars != null) {
+                    if (Objects.requireNonNull(cars).size()>0) {
+                        int i = 0;
                         for (String x:cars){
+                            //final boolean setSelectedCar = (i++ == cars.size() - 1);
+
+                            final int finalI = i;
                             db.collection("cars").document(x).get()
                                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                         @Override
@@ -200,6 +204,9 @@ public class MainActivity extends AppCompatActivity {
                                                     carSpinnerItemList.add(new CarSpinnerItem(document.getId(), (String) document.get("name")));
 
                                                     carSpinner_adapter.notifyDataSetChanged();
+
+                                                    if(/*setSelectedCar&&*/ SP.getString("selectedCarId", "x").equals(document.getId()))
+                                                        SP_CarSelect.setSelection(finalI);
 
                                                 } else {
                                                     Log.d(TAG, "No such document");
@@ -928,6 +935,7 @@ public class MainActivity extends AppCompatActivity {
         currentCarRef = db.collection("cars").document(selectedCarId);
         currentCarDataRef = currentCarRef.collection("data");
         SPEdit.putString("selectedCarId",selectedCarId);
+        SPEdit.apply();
 
         if(!selectedCarId.equals("x")) {
 
