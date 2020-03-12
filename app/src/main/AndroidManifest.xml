@@ -12,6 +12,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".NewCarActivity"
+            android:label="@string/title_activity_new_car"></activity>
+        <activity
             android:name=".CarSettingsActivity"
             android:label="@string/title_activity_car_settings"
             android:parentActivityName=".MainActivity">

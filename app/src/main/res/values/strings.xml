@@ -94,6 +94,7 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="test2">Test2</string>
+    <string name="title_activity_new_car">New Car</string>
 
 
 </resources>
