@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Objects;
+
+import static com.a8lambda8.carlog.myUtils.DateFormat_dmhms;
+import static com.a8lambda8.carlog.myUtils.TAG;
 
 /**
  * Created by jwasl on 23.11.2017.
@@ -92,13 +96,14 @@ class TIME_picker {
         TP = alertView.findViewById(R.id.timePicker);
 
         TP.setIs24HourView(true);
-        TP.setHour(out.get(Calendar.HOUR));
+        TP.setHour(out.get(Calendar.HOUR_OF_DAY));
         TP.setMinute(out.get(Calendar.MINUTE));
 
         TP.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                out.set(0,selectedMinute,selectedHour, out.get(Calendar.DAY_OF_MONTH), out.get(Calendar.MONTH), out.get(Calendar.YEAR));
+                out.set(out.get(Calendar.YEAR), out.get(Calendar.MONTH), out.get(Calendar.DAY_OF_MONTH), selectedMinute,selectedHour,0);
+                Log.d(TAG, "onTimeChanged: "+ String.format("changed to: %s", DateFormat_dmhms.format((out.getTime()))));
             }
         });
 
@@ -120,10 +125,10 @@ class TIME_picker {
         DP.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                out.set(0,out.get(Calendar.MINUTE),out.get(Calendar.HOUR), dayOfMonth, monthOfYear, year);
+                out.set(year,monthOfYear,dayOfMonth,out.get(Calendar.HOUR_OF_DAY),out.get(Calendar.MINUTE),out.get(Calendar.SECOND));
+                Log.d(TAG, "onTimeChanged: "+ String.format("Start Zeit: %s", DateFormat_dmhms.format((out.getTime()))));
             }
         });
-
 
         alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
             @Override
@@ -131,7 +136,6 @@ class TIME_picker {
 
             }
         });
-
 
         alert.show();
     }
