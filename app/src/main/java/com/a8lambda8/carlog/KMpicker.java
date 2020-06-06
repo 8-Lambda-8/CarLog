@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import static com.a8lambda8.carlog.myUtils.TAG;
+
 /**
  * Created by jwasl on 20.11.2017.
  *
@@ -90,7 +92,7 @@ class KMpicker {
 
     private void updateTV(){
         int km = KM;
-        Log.i("xxx","km:"+km);
+        Log.d(TAG,"km:"+km);
         for(int i = 0;i<6;i++) {
             tv[i].setText(String.valueOf(km%10));
             km /= 10;
@@ -98,13 +100,13 @@ class KMpicker {
     }
 
     private void add(int pot){
-        Log.i("xxx","a"+pot+" | +"+ Math.pow(10,pot));
+        Log.d(TAG,"add_"+pot+" | +"+ Math.pow(10,pot));
         KM += Math.pow(10,pot);
         updateTV();
     }
 
     private void sub(int pot){
-        Log.i("xxx","s"+pot+" | -"+Math.pow(10,pot));
+        Log.d(TAG,"sub_"+pot+" | -"+Math.pow(10,pot));
         KM -= Math.pow(10,pot);
         updateTV();
     }
