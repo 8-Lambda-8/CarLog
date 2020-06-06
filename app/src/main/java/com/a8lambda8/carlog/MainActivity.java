@@ -731,7 +731,7 @@ public class MainActivity extends AppCompatActivity {
 
                 duration.setTimeInMillis(currTime.getTimeInMillis() - timeStart.getTimeInMillis()-3600000);
 
-                Log.d(TAG, String.format("dur updater: %d - %d = %d", currTime.getTimeInMillis(), timeStart.getTimeInMillis(),currTime.getTimeInMillis() - timeStart.getTimeInMillis()));
+                //Log.d(TAG, String.format("dur updater: %d - %d = %d", currTime.getTimeInMillis(), timeStart.getTimeInMillis(),currTime.getTimeInMillis() - timeStart.getTimeInMillis()));
 
                 TV_dur.setText(String.format("Dauer:       %s", TimeFormat_hms.format(duration.getTime())));
             }
@@ -873,14 +873,21 @@ public class MainActivity extends AppCompatActivity {
                 switch (msg.arg1){
                     case 0:{
                         timeStart.setTime(((GregorianCalendar) msg.obj).getTime());
-                        TV_start.setText(String.format("Start Zeit: %s", DateFormat_dmhms.format(((GregorianCalendar) msg.obj).getTime())));
+                        TV_end.setText(String.format("End Zeit: %s", DateFormat_dmhms.format(timeStart.getTime())));
+
+                        SPEdit.putLong("timeStart",timeStart.getTimeInMillis());
+                        SPEdit.apply();
 
                         updateDur();
                         break;
                     }
                     case 1:{
                         timeEnd.setTime(((GregorianCalendar) msg.obj).getTime());
-                        TV_end.setText(String.format("End Zeit: %s", DateFormat_dmhms.format(((GregorianCalendar) msg.obj).getTime())));
+                        TV_end.setText(String.format("End Zeit: %s", DateFormat_dmhms.format(timeEnd.getTime())));
+
+                        SPEdit.putLong("timeEnd",timeEnd.getTimeInMillis());
+                        SPEdit.apply();
+
                         updateDur();
                         break;
                     }
