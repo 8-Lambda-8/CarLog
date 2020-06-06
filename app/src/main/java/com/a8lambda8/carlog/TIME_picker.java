@@ -102,7 +102,7 @@ class TIME_picker {
         TP.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                out.set(out.get(Calendar.YEAR), out.get(Calendar.MONTH), out.get(Calendar.DAY_OF_MONTH), selectedMinute,selectedHour,0);
+                out.set(out.get(Calendar.YEAR), out.get(Calendar.MONTH), out.get(Calendar.DAY_OF_MONTH), selectedHour,selectedMinute,0);
                 Log.d(TAG, "onTimeChanged: "+ String.format("changed to: %s", DateFormat_dmhms.format((out.getTime()))));
             }
         });
