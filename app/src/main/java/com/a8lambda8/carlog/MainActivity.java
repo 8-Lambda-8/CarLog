@@ -83,13 +83,15 @@ public class MainActivity extends AppCompatActivity {
     Button B_start, B_stop, B_add, B_cls;
     EditText ET_startLoc, ET_startKm, ET_endKm, ET_drain, ET_speed;
     AutoCompleteTextView ET_endLoc;
-    TextView TV_start, TV_end, TV_dur;
+    TextView TV_start, TV_end, TV_dur, TV_speed, TV_drain;
     ListView LV;
     trip_Item_list ItemList;
     list_adapter listAdapter;
     Spinner SP_CarSelect;
 
     Boolean started = false;
+    Boolean speedEnabled = true;
+    Boolean drainEnabled = true;
 
     GregorianCalendar timeStart, timeEnd, duration, currTime;
 
@@ -526,6 +528,11 @@ public class MainActivity extends AppCompatActivity {
         TV_start = findViewById(R.id.tv_start);
         TV_end = findViewById(R.id.tv_end);
         TV_dur = findViewById(R.id.tv_dur);
+        TV_speed = findViewById(R.id.tv_speed);
+        TV_drain = findViewById(R.id.tv_drain);
+
+
+
 
 
         TV_start.setOnClickListener(new View.OnClickListener() {
@@ -608,8 +615,10 @@ public class MainActivity extends AppCompatActivity {
                 item.setStart(Integer.parseInt(ET_startKm.getText().toString()));
                 item.setEnd(Integer.parseInt(ET_endKm.getText().toString()));
 
-                item.setSpeed(ET_speed.getText().toString());
-                item.setDrain(ET_drain.getText().toString());
+                if (speedEnabled)
+                    item.setSpeed(ET_speed.getText().toString());
+                if (drainEnabled)
+                    item.setDrain(ET_drain.getText().toString());
 
                 item.setDriverName(username);
                 item.setDriverId(mAuth.getUid());
@@ -794,8 +803,8 @@ public class MainActivity extends AppCompatActivity {
                 Objects.equals(ET_endLoc.getText().toString(), "")||
                 Objects.equals(ET_startKm.getText().toString(), "")||
                 Objects.equals(ET_endKm.getText().toString(), "")||
-                Objects.equals(ET_drain.getText().toString(), "")||
-                Objects.equals(ET_speed.getText().toString(), "")||
+                (drainEnabled && Objects.equals(ET_drain.getText().toString(), ""))||
+                (speedEnabled && Objects.equals(ET_speed.getText().toString(), ""))|
                 timeEnd.getTimeInMillis()<=20000||
                 timeStart.getTimeInMillis()<=20000
                 ){
@@ -819,8 +828,20 @@ public class MainActivity extends AppCompatActivity {
 
         final EditText drain = alertView.findViewById(R.id.etDrain);
         final EditText speed = alertView.findViewById(R.id.etSpeed);
+        final TextView tv_drain = alertView.findViewById(R.id.tvDrain);
+        final TextView tv_speed = alertView.findViewById(R.id.tvSpeed);
 
         final EditText price = alertView.findViewById(R.id.etPrice);
+
+        if(!drainEnabled) {
+            drain.setVisibility(View.GONE);
+            tv_drain.setVisibility(View.GONE);
+        }
+
+        if(!speedEnabled) {
+            speed.setVisibility(View.GONE);
+            tv_speed.setVisibility(View.GONE);
+        }
 
         startKm.setText(SP.getString("lastRefuel","0"));
 
@@ -835,8 +856,10 @@ public class MainActivity extends AppCompatActivity {
                 item.setStart(Integer.parseInt(startKm.getText().toString()));
                 item.setEnd(Integer.parseInt(endKm.getText().toString()));
 
-                item.setSpeed(speed.getText().toString());
-                item.setDrain(drain.getText().toString());
+                if(drainEnabled)
+                    item.setDrain(drain.getText().toString());
+                if(speedEnabled)
+                    item.setSpeed(speed.getText().toString());
 
                 item.setDriverName(username);
                 item.setDriverId(mAuth.getUid());
@@ -1053,7 +1076,47 @@ public class MainActivity extends AppCompatActivity {
                             SPEdit.putString("lastKm", (String) map.get("lastKm"));
                             SPEdit.putString("lastLoc", (String) map.get("lastLoc"));
 
-                            SPEdit.apply();
+                        }
+                        if(snapshot.get("owner")!=null) {
+                            SPEdit.putString("owner", (String) snapshot.get("owner"));
+                        }
+                        if(snapshot.get("drivers")!=null) {
+                            Set<String> drivers = new ArraySet<>();
+                            drivers.addAll((Collection<? extends String>) snapshot.get("drivers"));
+
+                            SPEdit.putStringSet("drivers",drivers);
+                        }
+                        if(snapshot.get("name")!=null) {
+                            SPEdit.putString("name", (String) snapshot.get("name"));
+                        }
+                        if(snapshot.get("type")!=null) {
+                            SPEdit.putString("type", (String) snapshot.get("type"));
+                        }
+                        if(snapshot.get("speedEnabled")!=null) {
+                            SPEdit.putBoolean("speedEnabled", (Boolean) snapshot.get("speedEnabled"));
+                        }
+                        if(snapshot.get("drainEnabled")!=null) {
+                            SPEdit.putBoolean("drainEnabled", (Boolean) snapshot.get("drainEnabled"));
+                        }
+
+                        SPEdit.apply();
+
+                        drainEnabled = SP.getBoolean("drainEnabled",true);
+                        speedEnabled = SP.getBoolean("speedEnabled",true);
+
+                        if (speedEnabled) {
+                            ET_speed.setVisibility(View.VISIBLE);
+                            TV_speed.setVisibility(View.VISIBLE);
+                        }else {
+                            ET_speed.setVisibility(View.GONE);
+                            TV_speed.setVisibility(View.GONE);
+                        }
+                        if (drainEnabled) {
+                            ET_drain.setVisibility(View.VISIBLE);
+                            TV_drain.setVisibility(View.VISIBLE);
+                        }else {
+                            ET_drain.setVisibility(View.GONE);
+                            TV_drain.setVisibility(View.GONE);
                         }
 
                     } else {
